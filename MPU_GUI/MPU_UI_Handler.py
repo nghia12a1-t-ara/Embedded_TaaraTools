@@ -230,16 +230,27 @@ class Window(QMainWindow, Ui_MainWindow):
     def GenarateCode(self):
         Window.CollectData(self)
         boolCheckConfig = ConfigList[(len(ConfigList) - 1)]
-        print(ConfigList)
-        print(boolCheckConfig)
         
         GenerateFile(tempList[0], ConfigList, ConfigListName)
         TIME_LIMIT = 100
         count = 0
+
+        ### Reset all lists
+        ConfigList = []
+        booleanConfigList = ["", "", ""]
+        tempList = []
+        SizeList = []
+
+        ### Generate XML file output
+        GenerateXML()
+
+        ### Progress and Notification
         while count < TIME_LIMIT:
             count += 1
             time.sleep(0.001)
             self.GenProcess.setValue(count)
+            
+        QMessageBox.about(self, "Infomation", "Generate Code Done!!!")
         
 #################################################################
 ########################## MAIN FUNCTION ########################

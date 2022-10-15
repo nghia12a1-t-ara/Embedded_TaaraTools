@@ -1,6 +1,10 @@
 import os
 from pathlib import Path
 
+### Symbol of Multiple Code Generation in Source Codes
+CODE_GEN_START_TEXT = '/* Generate Code */'
+CODE_GEN_END_TEXT   = '/* !Generate Code */'
+
 """
  @ List all Configuration Files to Gen Sources
 """
@@ -33,9 +37,11 @@ def GenerateFile(Folder, ConfigList, ConfigListName):
     boolCheckList = ConfigList[configLen]
     listBoolName = ["b_DefaultMemMap", "b_MPUinFault", "b_EnMemFault"]
     
+    # Get all configuration files
     ConfigListFile = getConfigFile(Folder)
     
-    for i in range(configLen):
+    ### Generate each files in Config Folder
+    for i in range(len(ConfigListFile)):
         GenString = ''
         cfgFile = ConfigListFile[i]
         mysrcfile = Path(cfgFile)
@@ -44,17 +50,18 @@ def GenerateFile(Folder, ConfigList, ConfigListName):
         GenFile = getSourceFile(cfgFile)
         mydestfile = Path(GenFile)
         mydestfile.touch(exist_ok=True)
-            
+        
         fsrc = open(mysrcfile, 'r')
         srcText = fsrc.read()
 
-        Index_1 = srcText.find('/* Generate Code */') + 19
-        Index_2 = srcText.find('/* !Generate Code */')
+        Index_1 = srcText.find(CODE_GEN_START_TEXT) + len(CODE_GEN_START_TEXT)
+        Index_2 = srcText.find(CODE_GEN_END_TEXT)
         
-        # Handler Config Code
-        GenString = ReplaceCfg(srcText, ConfigList, ConfigListName)
-        print(GenString)
-        srcText = srcText.replace(srcText[Index_1:Index_2], GenString)
+        ### Generate multiple config Code
+        if Index_1 != -1 and Index_2 != -1:
+            # Handler Config Code
+            GenString = ReplaceCfg(srcText, ConfigList, ConfigListName)
+            srcText = srcText.replace(srcText[Index_1:Index_2], GenString)
         
         # Handler boolean Cheking
         for xx in range(len(listBoolName)):
@@ -131,4 +138,3 @@ def getFileName(path, levels = 1):
     # Parent directory upto specified
     # level
     return os.path.relpath(path, common)
-
