@@ -7,7 +7,6 @@
  *	Link repository: 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-
 #ifndef __ASLOCALIZER_H__
 #define __ASLOCALIZER_H__
 
