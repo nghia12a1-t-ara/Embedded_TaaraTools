@@ -1,5 +1,14 @@
-# Description
+# Embedded_MyTools Description
 - This repository implements some tools to support my work with Embedded System.
 - These tools are built by Python and C++
 
-@TODO
+## Tools List
+### MCAL_MPU_GUI
+ - This tool simulate the Autosar MCAL Tool GUI for MPU (Memory Protection Unit) Peripheral of STM32 Microcontroller
+ - It provides for User the configuration for MPU and generate the source Code for MPU Driver
+### TaaR_SerialManager
+ - This tool use to communicate with COM PORT, to simulate the Serial/UART Device or test the Serial Signal from Device
+ - Test: Communicate PC with Arduino Uno R3 via UART
+### TaaR_Coding_Style
+ - This to use to check and fix the Coding Style for C/C++ Projects
+ - Maintain from the Tool of Mr.Devil [link]
