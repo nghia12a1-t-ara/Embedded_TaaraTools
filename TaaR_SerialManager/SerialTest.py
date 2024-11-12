@@ -10,22 +10,49 @@
 '''
     Connect Arduino <-> PC (Open this tool)
     Arduino Code:
-    void setup() {
+
+    void setup()
+    {
       Serial.begin(9600);
     }
-    void loop() {
+    void loop()
+    {
       // send data only when you receive data
-      if (Serial.available() > 0) {
-        incomingByte = Serial.read();
-        Serial.write(incomingByte+1);
+      if (Serial.available() > 0)
+      {
+        Serial.write(Serial.read());
       }
     }
 '''
 
 from TaaR_SerialManager import SerialManager
+import time
+
+def UART_RecvCallback(buffer):
+    print("The receive character from Arduino = ", buffer)
 
 def main():
-    pass
+    UART = SerialManager(port="COM3", baudrate=115200, timeout=1)
+    if UART.Connect():
+        print("Connect is done")
+    else:
+        print("Connect is fail")
+    
+    # UART.SetRecvEndByte(0xBB) # default endByte = '\n'
+    
+    ######### Start Read Async ##########
+    UART.ReadAsync(ByteNum=2, Callback=UART_RecvCallback)
+
+    # Send data to Arduino 'A' - Expected Recving 'B' from Arduino
+    UART.SendByte('AA')
+
+    while True:
+        character = input("Input the character to send to Arduino: ")
+        UART.SendByte(str(character))
+        time.sleep(2)
+        character = input("Input the character to send to Arduino: ")
+        UART.SendByte(str(character))
+        time.sleep(2)
     
 ###############################################
 if __name__ == "__main__":
