@@ -58,15 +58,6 @@ ostream* _err = &cerr;           // direct error messages to cerr
 ASConsole* g_console = NULL;     // class to encapsulate console variables
 #endif
 
-#ifdef ASTYLE_JNI
-// java library build variables
-JNIEnv*   g_env;
-jobject   g_obj;
-jmethodID g_mid;
-#endif
-
-const char*    g_version  =  "2.04";
-
 //-----------------------------------------------------------------------------
 // ASStreamIterator class
 // typename will be istringstream for GUI and istream otherwise
@@ -465,12 +456,7 @@ void ASConsole::formatFile(const string &fileName_)
 	// according to the file's suffix.
 	if (!formatter.getModeManuallySet())
 	{
-		if (stringEndsWith(fileName_, string(".java")))
-			formatter.setJavaStyle();
-		else if (stringEndsWith(fileName_, string(".cs")))
-			formatter.setSharpStyle();
-		else
-			formatter.setCStyle();
+		formatter.setCStyle();
 	}
 
 	// set line end format
@@ -1296,8 +1282,8 @@ bool ASConsole::isPathExclued(const string &subPath)
 void ASConsole::printHelp() const
 {
 	(*_err) << endl;
-	(*_err) << "                     Artistic Style " << g_version << endl;
-	(*_err) << "                     Maintained by: Jim Pattee\n";
+	(*_err) << "                     Artistic Style for Embedded C/C++\n";
+	(*_err) << "                     Maintained by: Nghia Taarabt\n";
 	(*_err) << "                     Original Author: Tal Davidson\n";
 	(*_err) << endl;
 	(*_err) << "Usage  :  astyle [options] Source1.cpp Source2.cpp  [...]\n";
@@ -1310,7 +1296,7 @@ void ASConsole::printHelp() const
 	(*_err) << "Wildcards (* and ?) may be used in the filename.\n";
 	(*_err) << "A \'recursive\' option can process directories recursively.\n";
 	(*_err) << endl;
-	(*_err) << "By default, astyle is set up to indent C/C++/C#/Java files, with four\n";
+	(*_err) << "By default, astyle is set up to indent C/C++ files, with four\n";
 	(*_err) << "spaces per indent, a maximal indentation of 40 spaces inside continuous\n";
 	(*_err) << "statements, a minimum indentation of eight spaces inside conditional\n";
 	(*_err) << "statements, and NO formatting options.\n";
@@ -1592,12 +1578,6 @@ void ASConsole::printHelp() const
 	(*_err) << "    --mode=c\n";
 	(*_err) << "    Indent a C or C++ source file (this is the default).\n";
 	(*_err) << endl;
-	(*_err) << "    --mode=java\n";
-	(*_err) << "    Indent a Java source file.\n";
-	(*_err) << endl;
-	(*_err) << "    --mode=cs\n";
-	(*_err) << "    Indent a C# source file.\n";
-	(*_err) << endl;
 	(*_err) << "Objective-C Options:\n";
 	(*_err) << "--------------------\n";
 	(*_err) << "    --align-method-colon  OR  -xM\n";
@@ -1751,7 +1731,7 @@ void ASConsole::processOptions(vector<string> &argvOptions)
 		else if ( isOption(arg, "-V" )
 		          || isOption(arg, "--version") )
 		{
-			(*_err) << "Artistic Style Version " << g_version << endl;
+			(*_err) << "Artistic Style for Embedded C/C++ \n";
 			exit(EXIT_SUCCESS);
 		}
 		else if (arg[0] == '-')
@@ -1959,7 +1939,6 @@ void ASConsole::printVerboseHeader() const
 	ptr = localtime(&lt);
 	strftime(str, 20, "%x", ptr);
 	// print the header
-	printf("Artistic Style %s     %s\n", g_version, str);
 	// print options file
 	if (!optionsFileName.empty())
 		printf(_("Using default options file %s\n"), optionsFileName.c_str());
@@ -2872,20 +2851,9 @@ void ASOptions::parseOption(const string &arg, const string &errorInfo)
 			formatter.setFormattingStyle(STYLE_GOOGLE);
 		else isOptionError(arg, errorInfo);
 	}
-	// must check for mode=cs before mode=c !!!
-	else if ( isOption(arg, "mode=cs") )
-	{
-		formatter.setSharpStyle();
-		formatter.setModeManuallySet(true);
-	}
 	else if ( isOption(arg, "mode=c") )
 	{
 		formatter.setCStyle();
-		formatter.setModeManuallySet(true);
-	}
-	else if ( isOption(arg, "mode=java") )
-	{
-		formatter.setJavaStyle();
 		formatter.setModeManuallySet(true);
 	}
 	else if ( isParamOption(arg, "t", "indent=tab=") )
@@ -3440,78 +3408,6 @@ bool ASOptions::isParamOption(const string &arg, const char* option1, const char
 //----------------------------------------------------------------------------
 
 using namespace astyle;
-
-//----------------------------------------------------------------------------
-// ASTYLE_JNI functions for calling AStyleMain
-//----------------------------------------------------------------------------
-
-#ifdef ASTYLE_JNI
-
-// called by a java program to get the version number
-// the function name is constructed from method names in the calling java program
-extern "C"  EXPORT
-jstring STDCALL Java_AStyleInterface_AStyleGetVersion(JNIEnv* env, jclass)
-{
-	return env->NewStringUTF(g_version);
-}
-
-// called by a java program to format the source code
-// the function name is constructed from method names in the calling java program
-extern "C"  EXPORT
-jstring STDCALL Java_AStyleInterface_AStyleMain(JNIEnv* env,
-                                                jobject obj,
-                                                jstring textInJava,
-                                                jstring optionsJava)
-{
-	g_env = env;                                // make object available globally
-	g_obj = obj;                                // make object available globally
-
-	jstring textErr = env->NewStringUTF("");    // zero length text returned if an error occurs
-
-	// get the method ID
-	jclass cls = env->GetObjectClass(obj);
-	g_mid = env->GetMethodID(cls, "ErrorHandler", "(ILjava/lang/String;)V");
-	if (g_mid == 0)
-	{
-		cout << "Cannot find java method ErrorHandler" << endl;
-		return textErr;
-	}
-
-	// convert jstring to char*
-	const char* textIn = env->GetStringUTFChars(textInJava, NULL);
-	const char* options = env->GetStringUTFChars(optionsJava, NULL);
-
-	// call the C++ formatting function
-	char* textOut = AStyleMain(textIn, options, javaErrorHandler, javaMemoryAlloc);
-	// if an error message occurred it was displayed by errorHandler
-	if (textOut == NULL)
-		return textErr;
-
-	// release memory
-	jstring textOutJava = env->NewStringUTF(textOut);
-	delete [] textOut;
-	env->ReleaseStringUTFChars(textInJava, textIn);
-	env->ReleaseStringUTFChars(optionsJava, options);
-
-	return textOutJava;
-}
-
-// Call the Java error handler
-void STDCALL javaErrorHandler(int errorNumber, const char* errorMessage)
-{
-	jstring errorMessageJava = g_env->NewStringUTF(errorMessage);
-	g_env->CallVoidMethod(g_obj, g_mid, errorNumber, errorMessageJava);
-}
-
-// Allocate memory for the formatted text
-char* STDCALL javaMemoryAlloc(unsigned long memoryNeeded)
-{
-	// error condition is checked after return from AStyleMain
-	char* buffer = new(nothrow) char [memoryNeeded];
-	return buffer;
-}
-#endif	// ASTYLE_JNI
-
 //----------------------------------------------------------------------------
 // Entry point for AStyleMainUtf16
 //----------------------------------------------------------------------------
@@ -3562,7 +3458,6 @@ extern "C" EXPORT utf16_t* STDCALL AStyleMainUtf16(const utf16_t* pSourceIn,	// 
 /*
  * This is apparently no longer required.
  * IMPORTANT VC DLL linker for WIN32 must have the parameter  /EXPORT:AStyleMain=_AStyleMain@16
- *                                                            /EXPORT:AStyleGetVersion=_AStyleGetVersion@0
  * No /EXPORT is required for x64
  */
 extern "C" EXPORT char* STDCALL AStyleMain(const char* pSourceIn,		// the source to be formatted
@@ -3641,11 +3536,6 @@ extern "C" EXPORT char* STDCALL AStyleMain(const char* pSourceIn,		// the source
 		               "The incorrectly formatted file will be returned for debugging.");
 #endif
 	return pTextOut;
-}
-
-extern "C" EXPORT const char* STDCALL AStyleGetVersion (void)
-{
-	return g_version;
 }
 
 // ASTYLECON_LIB is defined to exclude "main" from the test programs

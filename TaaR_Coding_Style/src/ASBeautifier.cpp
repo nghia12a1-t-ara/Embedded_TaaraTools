@@ -142,8 +142,6 @@ ASBeautifier::ASBeautifier(const ASBeautifier &other) : ASBase(other)
 	isElseHeaderIndent = other.isElseHeaderIndent;
 	isCaseHeaderCommentIndent = other.isCaseHeaderCommentIndent;
 	isNonInStatementArray = other.isNonInStatementArray;
-	isSharpAccessor = other.isSharpAccessor;
-	isSharpDelegate = other.isSharpDelegate;
 	isInExternC = other.isInExternC;
 	isInBeautifySQL = other.isInBeautifySQL;
 	isInIndentableStruct = other.isInIndentableStruct;
@@ -360,8 +358,6 @@ void ASBeautifier::init(ASSourceIterator* iter)
 	foundPreCommandMacro = false;
 
 	isNonInStatementArray = false;
-	isSharpAccessor = false;
-	isSharpDelegate = false;
 	isInExternC = false;
 	isInBeautifySQL = false;
 	isInIndentableStruct = false;
@@ -388,12 +384,12 @@ void ASBeautifier::initVectors()
 	preCommandHeaders->clear();
 	indentableHeaders->clear();
 
-	ASResource::buildHeaders(headers, fileType, true);
-	ASResource::buildNonParenHeaders(nonParenHeaders, fileType, true);
+	ASResource::buildHeaders(headers, true);
+	ASResource::buildNonParenHeaders(nonParenHeaders, true);
 	ASResource::buildAssignmentOperators(assignmentOperators);
 	ASResource::buildNonAssignmentOperators(nonAssignmentOperators);
-	ASResource::buildPreBlockStatements(preBlockStatements, fileType);
-	ASResource::buildPreCommandHeaders(preCommandHeaders, fileType);
+	ASResource::buildPreBlockStatements(preBlockStatements);
+	ASResource::buildPreCommandHeaders(preCommandHeaders);
 	ASResource::buildIndentableHeaders(indentableHeaders);
 }
 
@@ -403,22 +399,6 @@ void ASBeautifier::initVectors()
 void ASBeautifier::setCStyle()
 {
 	fileType = C_TYPE;
-}
-
-/**
- * set indentation style to Java.
- */
-void ASBeautifier::setJavaStyle()
-{
-	fileType = JAVA_TYPE;
-}
-
-/**
- * set indentation style to C#.
- */
-void ASBeautifier::setSharpStyle()
-{
-	fileType = SHARP_TYPE;
 }
 
 /**
@@ -951,8 +931,6 @@ string ASBeautifier::beautify(const string &originalLine)
 		activeBeautifierStack->back()->isElseHeaderIndent = isElseHeaderIndent;
 		activeBeautifierStack->back()->isCaseHeaderCommentIndent = isCaseHeaderCommentIndent;
 		activeBeautifierStack->back()->isNonInStatementArray = isNonInStatementArray;
-		activeBeautifierStack->back()->isSharpAccessor = isSharpAccessor;
-		activeBeautifierStack->back()->isSharpDelegate = isSharpDelegate;
 		activeBeautifierStack->back()->isInExternC = isInExternC;
 		activeBeautifierStack->back()->isInBeautifySQL = isInBeautifySQL;
 		activeBeautifierStack->back()->isInIndentableStruct = isInIndentableStruct;
@@ -1889,7 +1867,7 @@ void ASBeautifier::computePreliminaryIndentation()
 		           && (*headerStack)[i] == &AS_OPEN_BRACKET))
 			++indentCount;
 
-		if (!isJavaStyle() && !namespaceIndent && i > 0
+		if (isCStyle() && !namespaceIndent && i > 0
 		        && (*headerStack)[i - 1] == &AS_NAMESPACE
 		        && (*headerStack)[i] == &AS_OPEN_BRACKET)
 			--indentCount;
@@ -2181,33 +2159,18 @@ void ASBeautifier::parseCurrentLine(const string &line)
 						verbatimDelimiter = line.substr(i + 1, parenPos - i - 1);
 					}
 				}
-				else if (isSharpStyle() && prevCh == '@')
-					isInVerbatimQuote = true;
 				// check for "C" following "extern"
 				else if (g_preprocessorCppExternCBracket == 2 && line.compare(i, 3, "\"C\"") == 0)
 					++g_preprocessorCppExternCBracket;
 			}
 			else if (isInVerbatimQuote && ch == '"')
 			{
-				if (isCStyle())
+				string delim = ')' + verbatimDelimiter;
+				int delimStart = i - delim.length();
+				if (delimStart > 0 && line.substr(delimStart, delim.length()) == delim)
 				{
-					string delim = ')' + verbatimDelimiter;
-					int delimStart = i - delim.length();
-					if (delimStart > 0 && line.substr(delimStart, delim.length()) == delim)
-					{
-						isInQuote = false;
-						isInVerbatimQuote = false;
-					}
-				}
-				else if (isSharpStyle())
-				{
-					if (peekNextChar(line, i) == '"')           // check consecutive quotes
-						i++;
-					else
-					{
-						isInQuote = false;
-						isInVerbatimQuote = false;
-					}
+					isInQuote = false;
+					isInVerbatimQuote = false;
 				}
 			}
 			else if (quoteChar == ch)
@@ -2461,8 +2424,6 @@ void ASBeautifier::parseCurrentLine(const string &line)
 			                      || isNonInStatementArray
 			                      || isInObjCMethodDefinition
 			                      || isInObjCInterface
-			                      || isSharpAccessor
-			                      || isSharpDelegate
 			                      || isInExternC
 			                      || getNextWord(line, i) == AS_NEW
 			                      || (isInDefine &&
@@ -2830,11 +2791,6 @@ void ASBeautifier::parseCurrentLine(const string &line)
 				if (i == 0)
 					indentCount += classInitializerIndents;
 			}
-			else if (isJavaStyle() && lastLineHeader == &AS_FOR)
-			{
-				// found a java for-each statement
-				// so do nothing special
-			}
 			else
 			{
 				currentNonSpaceCh = ';'; // so that brackets after the ':' will appear as block-openers
@@ -2844,7 +2800,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 					isInCase = false;
 					ch = ';'; // from here on, treat char as ';'
 				}
-				else if (isCStyle() || (isSharpStyle() && peekedChar == ';'))
+				else if (isCStyle())
 				{
 					// is in a label (e.g. 'label1:')
 					if (labelIndent)
@@ -3037,17 +2993,18 @@ void ASBeautifier::parseCurrentLine(const string &line)
 				        && !(isCStyle() && newHeader == &AS_CLASS && isInEnum))	// is it 'enum class'
 				{
 					isInClassInitializer = true;
-
-					if (!isSharpStyle())
-						headerStack->push_back(newHeader);
+					headerStack->push_back(newHeader);
 					// do not need 'where' in the headerStack
 					// do not need second 'class' statement in a row
-					else if (!(newHeader == &AS_WHERE
-					           || (newHeader == &AS_CLASS
-					               && !headerStack->empty()
-					               && headerStack->back() == &AS_CLASS)))
+					if (!(newHeader == &AS_WHERE
+					    || (newHeader == &AS_CLASS
+						&& !headerStack->empty()
+						&& headerStack->back() == &AS_CLASS))
+					)
+					{
 						headerStack->push_back(newHeader);
-
+					}
+					
 					i += newHeader->length() - 1;
 					continue;
 				}

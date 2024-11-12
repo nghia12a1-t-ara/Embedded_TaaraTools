@@ -327,21 +327,6 @@ class ASLibrary
 }   // end of namespace astyle
 
 //----------------------------------------------------------------------------
-// declarations for java native interface (JNI) build
-// global because they are called externally and are NOT part of the namespace
-//----------------------------------------------------------------------------
-#ifdef ASTYLE_JNI
-void  STDCALL javaErrorHandler(int errorNumber, const char* errorMessage);
-char* STDCALL javaMemoryAlloc(unsigned long memoryNeeded);
-// the following function names are constructed from method names in the calling java program
-extern "C"  EXPORT
-jstring STDCALL Java_AStyleInterface_AStyleGetVersion(JNIEnv* env, jclass);
-extern "C"  EXPORT
-jstring STDCALL Java_AStyleInterface_AStyleMain
-(JNIEnv* env, jobject obj, jstring textInJava, jstring optionsJava);
-#endif //  ASTYLE_JNI
-
-//----------------------------------------------------------------------------
 // declarations for UTF-16 interface
 // global because they are called externally
 //----------------------------------------------------------------------------

@@ -63,7 +63,7 @@ using namespace std;
 
 namespace astyle {
 
-enum FileType { C_TYPE = 0, JAVA_TYPE = 1, SHARP_TYPE = 2 };
+enum FileType { C_TYPE = 0 };
 
 /* The enums below are not recognized by 'vectors' in Microsoft Visual C++
    V5 when they are part of a namespace!!!  Use Visual C++ V6 or higher.
@@ -197,14 +197,14 @@ class ASResource
 		virtual ~ASResource() {}
 		void buildAssignmentOperators(vector<const string*>* assignmentOperators);
 		void buildCastOperators(vector<const string*>* castOperators);
-		void buildHeaders(vector<const string*>* headers, int fileType, bool beautifier = false);
+		void buildHeaders(vector<const string*>* headers, bool beautifier = false);
 		void buildIndentableHeaders(vector<const string*>* indentableHeaders);
 		void buildNonAssignmentOperators(vector<const string*>* nonAssignmentOperators);
-		void buildNonParenHeaders(vector<const string*>* nonParenHeaders, int fileType, bool beautifier = false);
-		void buildOperators(vector<const string*>* operators, int fileType);
-		void buildPreBlockStatements(vector<const string*>* preBlockStatements, int fileType);
-		void buildPreCommandHeaders(vector<const string*>* preCommandHeaders, int fileType);
-		void buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders, int fileType);
+		void buildNonParenHeaders(vector<const string*>* nonParenHeaders, bool beautifier = false);
+		void buildOperators(vector<const string*>* operators);
+		void buildPreBlockStatements(vector<const string*>* preBlockStatements);
+		void buildPreCommandHeaders(vector<const string*>* preCommandHeaders);
+		void buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders);
 
 	public:
 		static const string AS_IF, AS_ELSE;
@@ -267,8 +267,6 @@ class ASBase
 	protected:
 		void init(int fileTypeArg) { baseFileType = fileTypeArg; }
 		bool isCStyle() const { return (baseFileType == C_TYPE); }
-		bool isJavaStyle() const { return (baseFileType == JAVA_TYPE); }
-		bool isSharpStyle() const { return (baseFileType == SHARP_TYPE); }
 
 		// check if a specific character is a digit
 		// NOTE: Visual C isdigit() gives assert error if char > 256
@@ -281,9 +279,7 @@ class ASBase
 			if (isWhiteSpace(ch)) return false;
 			if ((unsigned) ch > 127) return false;
 			return (isalnum((unsigned char)ch)
-			        || ch == '.' || ch == '_'
-			        || (isJavaStyle() && ch == '$')
-			        || (isSharpStyle() && ch == '@'));  // may be used as a prefix
+			        || ch == '.' || ch == '_');  // may be used as a prefix
 		}
 
 		// check if a specific character can be part of a header
@@ -340,7 +336,6 @@ class ASBeautifier : protected ASResource, protected ASBase
 		void setDefaultTabLength();
 		void setEmptyLineFill(bool state);
 		void setForceTabXIndentation(int length);
-		void setJavaStyle();
 		void setLabelIndent(bool state);
 		void setMaxInStatementIndentLength(int max);
 		void setMinConditionalIndentOption(int min);
@@ -349,7 +344,6 @@ class ASBeautifier : protected ASResource, protected ASBase
 		void setModifierIndent(bool state);
 		void setNamespaceIndent(bool state);
 		void setAlignMethodColon(bool state);
-		void setSharpStyle();
 		void setSpaceIndentation(int length = 4);
 		void setSwitchIndent(bool state);
 		void setTabIndentation(int length = 4, bool forceTabs = false);
@@ -392,8 +386,6 @@ class ASBeautifier : protected ASResource, protected ASBase
 		bool isElseHeaderIndent;
 		bool isCaseHeaderCommentIndent;
 		bool isNonInStatementArray;
-		bool isSharpAccessor;
-		bool isSharpDelegate;
 		bool isInExternC;
 		bool isInBeautifySQL;
 		bool isInIndentableStruct;
@@ -689,13 +681,11 @@ class ASFormatter : public ASBeautifier
 		bool isExecSQL(string  &line, size_t index) const;
 		bool isEmptyLine(const string &line) const;
 		bool isExternC() const;
-		bool isNextWordSharpNonParenHeader(int startChar) const;
 		bool isNonInStatementArrayBracket() const;
 		bool isOkToSplitFormattedLine();
 		bool isPointerOrReference() const;
 		bool isPointerOrReferenceCentered() const;
 		bool isPointerOrReferenceVariable(string &word) const;
-		bool isSharpStyleWithParen(const string* header) const;
 		bool isStructAccessModified(string  &firstLine, size_t index) const;
 		bool isUnaryOperator() const;
 		bool isImmediatelyPostCast() const;
@@ -945,7 +935,6 @@ class ASFormatter : public ASBeautifier
 		bool isInHeader;
 		bool isImmediatelyPostHeader;
 		bool isInCase;
-		bool isJavaStaticConstructor;
 
 	private:  // inline functions
 		// append the CURRENT character (curentChar) to the current formatted line.
@@ -990,7 +979,5 @@ bool sortOnName(const string* a, const string* b);
 typedef void (STDCALL* fpError)(int, const char*);      // pointer to callback error handler
 typedef char* (STDCALL* fpAlloc)(unsigned long);		// pointer to callback memory allocation
 extern "C" EXPORT char* STDCALL AStyleMain(const char*, const char*, fpError, fpAlloc);
-extern "C" EXPORT const char* STDCALL AStyleGetVersion (void);
-
 
 #endif // closes ASTYLE_H

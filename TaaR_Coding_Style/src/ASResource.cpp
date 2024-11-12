@@ -183,11 +183,6 @@ void ASResource::buildAssignmentOperators(vector<const string*>* assignmentOpera
 	assignmentOperators->push_back(&AS_AND_ASSIGN);
 	assignmentOperators->push_back(&AS_XOR_ASSIGN);
 
-	// Java
-	assignmentOperators->push_back(&AS_GR_GR_GR_ASSIGN);
-	assignmentOperators->push_back(&AS_GR_GR_ASSIGN);
-	assignmentOperators->push_back(&AS_LS_LS_ASSIGN);
-
 	// Unknown
 	assignmentOperators->push_back(&AS_LS_LS_LS_ASSIGN);
 
@@ -214,7 +209,7 @@ void ASResource::buildCastOperators(vector<const string*>* castOperators)
  *
  * @param headers       a reference to the vector to be built.
  */
-void ASResource::buildHeaders(vector<const string*>* headers, int fileType, bool beautifier)
+void ASResource::buildHeaders(vector<const string*>* headers, bool beautifier)
 {
 	headers->push_back(&AS_IF);
 	headers->push_back(&AS_ELSE);
@@ -227,41 +222,13 @@ void ASResource::buildHeaders(vector<const string*>* headers, int fileType, bool
 	headers->push_back(&AS_TRY);
 	headers->push_back(&AS_CATCH);
 
-	if (fileType == C_TYPE)
-	{
-		headers->push_back(&_AS_TRY);		// __try
-		headers->push_back(&_AS_FINALLY);	// __finally
-		headers->push_back(&_AS_EXCEPT);	// __except
-	}
-	if (fileType == JAVA_TYPE)
-	{
-		headers->push_back(&AS_FINALLY);
-		headers->push_back(&AS_SYNCHRONIZED);
-	}
-
-	if (fileType == SHARP_TYPE)
-	{
-		headers->push_back(&AS_FINALLY);
-		headers->push_back(&AS_FOREACH);
-		headers->push_back(&AS_LOCK);
-		headers->push_back(&AS_FIXED);
-		headers->push_back(&AS_GET);
-		headers->push_back(&AS_SET);
-		headers->push_back(&AS_ADD);
-		headers->push_back(&AS_REMOVE);
-	}
+	headers->push_back(&_AS_TRY);		// __try
+	headers->push_back(&_AS_FINALLY);	// __finally
+	headers->push_back(&_AS_EXCEPT);	// __except
 
 	if (beautifier)
 	{
-		if (fileType == C_TYPE)
-		{
-			headers->push_back(&AS_TEMPLATE);
-		}
-
-		if (fileType == JAVA_TYPE)
-		{
-			headers->push_back(&AS_STATIC);         // for static constructor
-		}
+		headers->push_back(&AS_TEMPLATE);
 	}
 	sort(headers->begin(), headers->end(), sortOnName);
 }
@@ -312,7 +279,7 @@ void ASResource::buildNonAssignmentOperators(vector<const string*>* nonAssignmen
  *
  * @param nonParenHeaders       a reference to the vector to be built.
  */
-void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, int fileType, bool beautifier)
+void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, bool beautifier)
 {
 	nonParenHeaders->push_back(&AS_ELSE);
 	nonParenHeaders->push_back(&AS_DO);
@@ -320,36 +287,12 @@ void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, in
 	nonParenHeaders->push_back(&AS_CATCH);		// can be paren or non-paren
 	nonParenHeaders->push_back(&AS_CASE);		// can be paren or non-paren
 	nonParenHeaders->push_back(&AS_DEFAULT);
-
-	if (fileType == C_TYPE)
-	{
-		nonParenHeaders->push_back(&_AS_TRY);		// __try
-		nonParenHeaders->push_back(&_AS_FINALLY);	// __finally
-	}
-	if (fileType == JAVA_TYPE)
-	{
-		nonParenHeaders->push_back(&AS_FINALLY);
-	}
-
-	if (fileType == SHARP_TYPE)
-	{
-		nonParenHeaders->push_back(&AS_FINALLY);
-		nonParenHeaders->push_back(&AS_GET);
-		nonParenHeaders->push_back(&AS_SET);
-		nonParenHeaders->push_back(&AS_ADD);
-		nonParenHeaders->push_back(&AS_REMOVE);
-	}
+	nonParenHeaders->push_back(&_AS_TRY);		// __try
+	nonParenHeaders->push_back(&_AS_FINALLY);	// __finally
 
 	if (beautifier)
 	{
-		if (fileType == C_TYPE)
-		{
-			nonParenHeaders->push_back(&AS_TEMPLATE);
-		}
-		if (fileType == JAVA_TYPE)
-		{
-			nonParenHeaders->push_back(&AS_STATIC);
-		}
+		nonParenHeaders->push_back(&AS_TEMPLATE);
 	}
 	sort(nonParenHeaders->begin(), nonParenHeaders->end(), sortOnName);
 }
@@ -360,7 +303,7 @@ void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, in
  *
  * @param operators             a reference to the vector to be built.
  */
-void ASResource::buildOperators(vector<const string*>* operators, int fileType)
+void ASResource::buildOperators(vector<const string*>* operators)
 {
 	operators->push_back(&AS_PLUS_ASSIGN);
 	operators->push_back(&AS_MINUS_ASSIGN);
@@ -405,11 +348,9 @@ void ASResource::buildOperators(vector<const string*>* operators, int fileType)
 	operators->push_back(&AS_BIT_AND);
 	operators->push_back(&AS_BIT_NOT);
 	operators->push_back(&AS_BIT_XOR);
-	if (fileType == C_TYPE)
-	{
-		operators->push_back(&AS_GCC_MIN_ASSIGN);
-		operators->push_back(&AS_GCC_MAX_ASSIGN);
-	}
+	operators->push_back(&AS_GCC_MIN_ASSIGN);
+	operators->push_back(&AS_GCC_MAX_ASSIGN);
+	
 	sort(operators->begin(), operators->end(), sortOnLength);
 }
 
@@ -420,27 +361,13 @@ void ASResource::buildOperators(vector<const string*>* operators, int fileType)
  *
  * @param preBlockStatements        a reference to the vector to be built.
  */
-void ASResource::buildPreBlockStatements(vector<const string*>* preBlockStatements, int fileType)
+void ASResource::buildPreBlockStatements(vector<const string*>* preBlockStatements)
 {
 	preBlockStatements->push_back(&AS_CLASS);
-	if (fileType == C_TYPE)
-	{
-		preBlockStatements->push_back(&AS_STRUCT);
-		preBlockStatements->push_back(&AS_UNION);
-		preBlockStatements->push_back(&AS_NAMESPACE);
-	}
-	if (fileType == JAVA_TYPE)
-	{
-		preBlockStatements->push_back(&AS_INTERFACE);
-		preBlockStatements->push_back(&AS_THROWS);
-	}
-	if (fileType == SHARP_TYPE)
-	{
-		preBlockStatements->push_back(&AS_INTERFACE);
-		preBlockStatements->push_back(&AS_NAMESPACE);
-		preBlockStatements->push_back(&AS_WHERE);
-		preBlockStatements->push_back(&AS_STRUCT);
-	}
+	preBlockStatements->push_back(&AS_STRUCT);
+	preBlockStatements->push_back(&AS_UNION);
+	preBlockStatements->push_back(&AS_NAMESPACE);
+		
 	sort(preBlockStatements->begin(), preBlockStatements->end(), sortOnName);
 }
 
@@ -453,25 +380,12 @@ void ASResource::buildPreBlockStatements(vector<const string*>* preBlockStatemen
  * the closing paren and the opening bracket.
  * e.g. in "void foo() const {}", "const" is a preCommandHeader.
  */
-void ASResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders, int fileType)
+void ASResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders)
 {
-	if (fileType == C_TYPE)
-	{
-		preCommandHeaders->push_back(&AS_CONST);
-		preCommandHeaders->push_back(&AS_VOLATILE);
-		preCommandHeaders->push_back(&AS_SEALED);		// Visual C only
-		preCommandHeaders->push_back(&AS_OVERRIDE);		// Visual C only
-	}
-
-	if (fileType == JAVA_TYPE)
-	{
-		preCommandHeaders->push_back(&AS_THROWS);
-	}
-
-	if (fileType == SHARP_TYPE)
-	{
-		preCommandHeaders->push_back(&AS_WHERE);
-	}
+	preCommandHeaders->push_back(&AS_CONST);
+	preCommandHeaders->push_back(&AS_VOLATILE);
+	preCommandHeaders->push_back(&AS_SEALED);		// Visual C only
+	preCommandHeaders->push_back(&AS_OVERRIDE);		// Visual C only
 
 	sort(preCommandHeaders->begin(), preCommandHeaders->end(), sortOnName);
 }
@@ -484,25 +398,13 @@ void ASResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders
  *
  * @param preDefinitionHeaders      a reference to the vector to be built.
  */
-void ASResource::buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders, int fileType)
+void ASResource::buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders)
 {
 	preDefinitionHeaders->push_back(&AS_CLASS);
-	if (fileType == C_TYPE)
-	{
-		preDefinitionHeaders->push_back(&AS_STRUCT);
-		preDefinitionHeaders->push_back(&AS_UNION);
-		preDefinitionHeaders->push_back(&AS_NAMESPACE);
-	}
-	if (fileType == JAVA_TYPE)
-	{
-		preDefinitionHeaders->push_back(&AS_INTERFACE);
-	}
-	if (fileType == SHARP_TYPE)
-	{
-		preDefinitionHeaders->push_back(&AS_STRUCT);
-		preDefinitionHeaders->push_back(&AS_INTERFACE);
-		preDefinitionHeaders->push_back(&AS_NAMESPACE);
-	}
+	preDefinitionHeaders->push_back(&AS_STRUCT);
+	preDefinitionHeaders->push_back(&AS_UNION);
+	preDefinitionHeaders->push_back(&AS_NAMESPACE);
+	
 	sort(preDefinitionHeaders->begin(), preDefinitionHeaders->end(), sortOnName);
 }
 
