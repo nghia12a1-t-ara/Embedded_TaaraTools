@@ -292,15 +292,15 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\ASBeautifier.cpp" />
     <ClCompile Include="..\..\..\src\ASEnhancer.cpp" />
-    <ClCompile Include="..\..\..\src\ASFormatter.cpp" />
-    <ClCompile Include="..\..\..\src\ASLocalizer.cpp" />
-    <ClCompile Include="..\..\..\src\ASResource.cpp" />
-    <ClCompile Include="..\..\..\src\astyle_main.cpp" />
+    <ClCompile Include="..\..\..\src\TRFormatter.cpp" />
+    <ClCompile Include="..\..\..\src\TRLanguage.cpp" />
+    <ClCompile Include="..\..\..\src\TRResource.cpp" />
+    <ClCompile Include="..\..\..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\ASLocalizer.h" />
-    <ClInclude Include="..\..\..\src\astyle.h" />
-    <ClInclude Include="..\..\..\src\astyle_main.h" />
+    <ClInclude Include="..\..\..\src\TRLanguage.h" />
+    <ClInclude Include="..\..\..\src\TaaRRule.h" />
+    <ClInclude Include="..\..\..\src\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

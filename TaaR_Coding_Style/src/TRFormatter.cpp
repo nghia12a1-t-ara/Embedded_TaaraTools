@@ -1,22 +1,21 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: ASFormatter.cpp
+ *	@File	: TRFormatter.cpp
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#include "astyle.h"
-
+#include "TaaRRule.h"
 #include <algorithm>
 #include <fstream>
 
-namespace astyle {
+namespace TaaRRule {
 /**
- * Constructor of ASFormatter
+ * Constructor of TRFormatter
  */
-ASFormatter::ASFormatter()
+TRFormatter::TRFormatter()
 {
 	sourceIterator = NULL;
 	enhancer = new ASEnhancer;
@@ -63,7 +62,7 @@ ASFormatter::ASFormatter()
 	shouldPadMethodPrefix = false;
 	shouldUnPadMethodPrefix = false;
 
-	// initialize ASFormatter member vectors
+	// initialize TRFormatter member vectors
 	formatterFileType = 9;		// reset to an invalid type
 	headers = new vector<const string*>;
 	nonParenHeaders = new vector<const string*>;
@@ -75,18 +74,18 @@ ASFormatter::ASFormatter()
 }
 
 /**
- * Destructor of ASFormatter
+ * Destructor of TRFormatter
  */
-ASFormatter::~ASFormatter()
+TRFormatter::~TRFormatter()
 {
-	// delete ASFormatter stack vectors
+	// delete TRFormatter stack vectors
 	deleteContainer(preBracketHeaderStack);
 	deleteContainer(bracketTypeStack);
 	deleteContainer(parenStack);
 	deleteContainer(structStack);
 	deleteContainer(questionMarkStack);
 
-	// delete ASFormatter member vectors
+	// delete TRFormatter member vectors
 	formatterFileType = 9;		// reset to an invalid type
 	delete headers;
 	delete nonParenHeaders;
@@ -97,23 +96,23 @@ ASFormatter::~ASFormatter()
 	delete castOperators;
 
 	// delete ASBeautifier member vectors
-	// must be done when the ASFormatter object is deleted (not ASBeautifier)
+	// must be done when the TRFormatter object is deleted (not ASBeautifier)
 	ASBeautifier::deleteBeautifierVectors();
 
 	delete enhancer;
 }
 
 /**
- * initialize the ASFormatter.
+ * initialize the TRFormatter.
  *
- * init() should be called every time a ASFormatter object is to start
+ * init() should be called every time a TRFormatter object is to start
  * formatting a NEW source file.
- * init() receives a pointer to a ASSourceIterator object that will be
+ * init() receives a pointer to a TRSourceIterator object that will be
  * used to iterate through the source code.
  *
- * @param sourceIterator     a pointer to the ASSourceIterator or ASStreamIterator object.
+ * @param sourceIterator     a pointer to the TRSourceIterator or TRStreamIterator object.
  */
-void ASFormatter::init(ASSourceIterator* si)
+void TRFormatter::init(TRSourceIterator* si)
 {
 	buildLanguageVectors();
 	fixOptionVariableConflicts();
@@ -256,7 +255,7 @@ void ASFormatter::init(ASSourceIterator* si)
  * build vectors for each programing language
  * depending on the file extension.
  */
-void ASFormatter::buildLanguageVectors()
+void TRFormatter::buildLanguageVectors()
 {
 	if (getFileType() == formatterFileType)  // don't build unless necessary
 		return;
@@ -271,23 +270,23 @@ void ASFormatter::buildLanguageVectors()
 	assignmentOperators->clear();
 	castOperators->clear();
 
-	ASResource::buildHeaders(headers);
-	ASResource::buildNonParenHeaders(nonParenHeaders);
-	ASResource::buildPreDefinitionHeaders(preDefinitionHeaders);
-	ASResource::buildPreCommandHeaders(preCommandHeaders);
+	TRResource::buildHeaders(headers);
+	TRResource::buildNonParenHeaders(nonParenHeaders);
+	TRResource::buildPreDefinitionHeaders(preDefinitionHeaders);
+	TRResource::buildPreCommandHeaders(preCommandHeaders);
 	if (operators->empty())
-		ASResource::buildOperators(operators);
+		TRResource::buildOperators(operators);
 	if (assignmentOperators->empty())
-		ASResource::buildAssignmentOperators(assignmentOperators);
+		TRResource::buildAssignmentOperators(assignmentOperators);
 	if (castOperators->empty())
-		ASResource::buildCastOperators(castOperators);
+		TRResource::buildCastOperators(castOperators);
 }
 
 /**
  * set the variables for each predefined style.
  * this will override any previous settings.
  */
-void ASFormatter::fixOptionVariableConflicts()
+void TRFormatter::fixOptionVariableConflicts()
 {
 	if (formattingStyle == STYLE_ALLMAN)
 	{
@@ -392,7 +391,7 @@ void ASFormatter::fixOptionVariableConflicts()
  *
  * @return    formatted line.
  */
-string ASFormatter::nextLine()
+string TRFormatter::nextLine()
 {
 	const string* newHeader;
 	bool isInVirginLine = isVirgin;
@@ -1141,7 +1140,7 @@ string ASFormatter::nextLine()
 			         && shouldBreakOneLineStatements
 			         && !foundQuestionMark          // not in a ?: sequence
 			         && !foundPreDefinitionHeader   // not in a definition block (e.g. class foo : public bar
-			         && previousCommandChar != ')'  // not immediately after closing paren of a method header, e.g. ASFormatter::ASFormatter(...) : ASBeautifier(...)
+			         && previousCommandChar != ')'  // not immediately after closing paren of a method header, e.g. TRFormatter::TRFormatter(...) : ASBeautifier(...)
 			         && previousChar != ':'         // not part of '::'
 			         && peekNextChar() != ':'       // not part of '::'
 			         && !squareBracketCount         // not in objC method call
@@ -1225,7 +1224,7 @@ string ASFormatter::nextLine()
 					if (peekNextChar() == '_')	// check for __asm
 						index = 5;
 
-					char peekedChar = ASBase::peekNextChar(currentLine, charNum + index);
+					char peekedChar = TRBase::peekNextChar(currentLine, charNum + index);
 					if (peekedChar == '{' || peekedChar == ' ')
 						isInAsmBlock = true;
 					else
@@ -1463,7 +1462,7 @@ string ASFormatter::nextLine()
  *
  * @return    are there any indented lines ready?
  */
-bool ASFormatter::hasMoreLines() const
+bool TRFormatter::hasMoreLines() const
 {
 	return !endOfCodeReached;
 }
@@ -1471,7 +1470,7 @@ bool ASFormatter::hasMoreLines() const
 /**
  * comparison function for BracketType enum
  */
-bool ASFormatter::isBracketType(BracketType a, BracketType b) const
+bool TRFormatter::isBracketType(BracketType a, BracketType b) const
 {
 	return ((a & b) == b);
 }
@@ -1481,7 +1480,7 @@ bool ASFormatter::isBracketType(BracketType a, BracketType b) const
  *
  * @param mode         the formatting style.
  */
-void ASFormatter::setFormattingStyle(FormatStyle style)
+void TRFormatter::setFormattingStyle(FormatStyle style)
 {
 	formattingStyle = style;
 }
@@ -1494,7 +1493,7 @@ void ASFormatter::setFormattingStyle(FormatStyle style)
  *
  * @param mode         the add brackets mode.
  */
-void ASFormatter::setAddBracketsMode(bool state)
+void TRFormatter::setAddBracketsMode(bool state)
 {
 	shouldAddBrackets = state;
 }
@@ -1507,7 +1506,7 @@ void ASFormatter::setAddBracketsMode(bool state)
  *
  * @param mode         the add one line brackets mode.
  */
-void ASFormatter::setAddOneLineBracketsMode(bool state)
+void TRFormatter::setAddOneLineBracketsMode(bool state)
 {
 	shouldAddBrackets = state;
 	shouldAddOneLineBrackets = state;
@@ -1521,7 +1520,7 @@ void ASFormatter::setAddOneLineBracketsMode(bool state)
  *
  * @param mode         the remove brackets mode.
  */
-void ASFormatter::setRemoveBracketsMode(bool state)
+void TRFormatter::setRemoveBracketsMode(bool state)
 {
 	shouldRemoveBrackets = state;
 }
@@ -1532,7 +1531,7 @@ void ASFormatter::setRemoveBracketsMode(bool state)
  *
  * @param mode         the bracket formatting mode.
  */
-void ASFormatter::setBracketFormatMode(BracketMode mode)
+void TRFormatter::setBracketFormatMode(BracketMode mode)
 {
 	bracketFormatMode = mode;
 }
@@ -1542,7 +1541,7 @@ void ASFormatter::setBracketFormatMode(BracketMode mode)
  *
  * @param state         the 'break after' mode.
  */
-void ASFormatter::setBreakAfterMode(bool state)
+void TRFormatter::setBreakAfterMode(bool state)
 {
 	shouldBreakLineAfterLogical = state;
 }
@@ -1556,7 +1555,7 @@ void ASFormatter::setBreakAfterMode(bool state)
  *
  * @param state         the closing header bracket breaking mode.
  */
-void ASFormatter::setBreakClosingHeaderBracketsMode(bool state)
+void TRFormatter::setBreakClosingHeaderBracketsMode(bool state)
 {
 	shouldBreakClosingHeaderBrackets = state;
 }
@@ -1569,7 +1568,7 @@ void ASFormatter::setBreakClosingHeaderBracketsMode(bool state)
  *
  * @param state         the 'else if()' breaking mode.
  */
-void ASFormatter::setBreakElseIfsMode(bool state)
+void TRFormatter::setBreakElseIfsMode(bool state)
 {
 	shouldBreakElseIfs = state;
 }
@@ -1579,7 +1578,7 @@ void ASFormatter::setBreakElseIfsMode(bool state)
  *
  * @param max         the maximum code length.
  */
-void ASFormatter::setMaxCodeLength(int max)
+void TRFormatter::setMaxCodeLength(int max)
 {
 	maxCodeLength = max;
 }
@@ -1592,7 +1591,7 @@ void ASFormatter::setMaxCodeLength(int max)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setOperatorPaddingMode(bool state)
+void TRFormatter::setOperatorPaddingMode(bool state)
 {
 	shouldPadOperators = state;
 }
@@ -1605,7 +1604,7 @@ void ASFormatter::setOperatorPaddingMode(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setParensOutsidePaddingMode(bool state)
+void TRFormatter::setParensOutsidePaddingMode(bool state)
 {
 	shouldPadParensOutside = state;
 }
@@ -1618,7 +1617,7 @@ void ASFormatter::setParensOutsidePaddingMode(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setParensInsidePaddingMode(bool state)
+void TRFormatter::setParensInsidePaddingMode(bool state)
 {
 	shouldPadParensInside = state;
 }
@@ -1631,7 +1630,7 @@ void ASFormatter::setParensInsidePaddingMode(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setParensFirstPaddingMode(bool state)
+void TRFormatter::setParensFirstPaddingMode(bool state)
 {
 	shouldPadFirstParen = state;
 }
@@ -1644,7 +1643,7 @@ void ASFormatter::setParensFirstPaddingMode(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setParensHeaderPaddingMode(bool state)
+void TRFormatter::setParensHeaderPaddingMode(bool state)
 {
 	shouldPadHeader = state;
 }
@@ -1657,7 +1656,7 @@ void ASFormatter::setParensHeaderPaddingMode(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setParensUnPaddingMode(bool state)
+void TRFormatter::setParensUnPaddingMode(bool state)
 {
 	shouldUnPadParens = state;
 }
@@ -1670,7 +1669,7 @@ void ASFormatter::setParensUnPaddingMode(bool state)
  *
  * @param state         the strip comment prefix mode.
  */
-void ASFormatter::setStripCommentPrefix(bool state)
+void TRFormatter::setStripCommentPrefix(bool state)
 {
 	shouldStripCommentPrefix = state;
 }
@@ -1683,7 +1682,7 @@ void ASFormatter::setStripCommentPrefix(bool state)
  *
  * @param state         the padding mode.
  */
-void ASFormatter::setMethodPrefixPaddingMode(bool state)
+void TRFormatter::setMethodPrefixPaddingMode(bool state)
 {
 	shouldPadMethodPrefix = state;
 }
@@ -1696,7 +1695,7 @@ void ASFormatter::setMethodPrefixPaddingMode(bool state)
  *
  * @param state         the unpadding mode.
  */
-void ASFormatter::setMethodPrefixUnPaddingMode(bool state)
+void TRFormatter::setMethodPrefixUnPaddingMode(bool state)
 {
 	shouldUnPadMethodPrefix = state;
 }
@@ -1706,7 +1705,7 @@ void ASFormatter::setMethodPrefixUnPaddingMode(bool state)
  *
  * @param mode         objective-c colon padding mode.
  */
-void ASFormatter::setObjCColonPaddingMode(ObjCColonPad mode)
+void TRFormatter::setObjCColonPaddingMode(ObjCColonPad mode)
 {
 	shouldPadMethodColon = true;
 	objCColonPadMode = mode;
@@ -1717,7 +1716,7 @@ void ASFormatter::setObjCColonPaddingMode(ObjCColonPad mode)
  *
  * @param state        true = attach, false = don't attach.
  */
-void ASFormatter::setAttachClosingBracket(bool state)
+void TRFormatter::setAttachClosingBracket(bool state)
 {
 	shouldAttachClosingBracket = state;
 }
@@ -1727,7 +1726,7 @@ void ASFormatter::setAttachClosingBracket(bool state)
  *
  * @param state        true = attach, false = use style default.
  */
-void ASFormatter::setAttachClass(bool state)
+void TRFormatter::setAttachClass(bool state)
 {
 	shouldAttachClass = state;
 }
@@ -1737,7 +1736,7 @@ void ASFormatter::setAttachClass(bool state)
  *
  * @param state        true = attach, false = use style default.
  */
-void ASFormatter::setAttachExternC(bool state)
+void TRFormatter::setAttachExternC(bool state)
 {
 	shouldAttachExternC = state;
 }
@@ -1747,7 +1746,7 @@ void ASFormatter::setAttachExternC(bool state)
  *
  * @param state        true = attach, false = use style default.
  */
-void ASFormatter::setAttachNamespace(bool state)
+void TRFormatter::setAttachNamespace(bool state)
 {
 	shouldAttachNamespace = state;
 }
@@ -1757,7 +1756,7 @@ void ASFormatter::setAttachNamespace(bool state)
  *
  * @param state        true = attach, false = use style default.
  */
-void ASFormatter::setAttachInline(bool state)
+void TRFormatter::setAttachInline(bool state)
 {
 	shouldAttachInline = state;
 }
@@ -1767,12 +1766,12 @@ void ASFormatter::setAttachInline(bool state)
  *
  * @param state        true = break, false = don't break.
  */
-void ASFormatter::setBreakOneLineBlocksMode(bool state)
+void TRFormatter::setBreakOneLineBlocksMode(bool state)
 {
 	shouldBreakOneLineBlocks = state;
 }
 
-void ASFormatter::setCloseTemplatesMode(bool state)
+void TRFormatter::setCloseTemplatesMode(bool state)
 {
 	shouldCloseTemplates = state;
 }
@@ -1782,7 +1781,7 @@ void ASFormatter::setCloseTemplatesMode(bool state)
  *
  * @param state        true = break, false = don't break.
  */
-void ASFormatter::setSingleStatementsMode(bool state)
+void TRFormatter::setSingleStatementsMode(bool state)
 {
 	shouldBreakOneLineStatements = state;
 }
@@ -1792,7 +1791,7 @@ void ASFormatter::setSingleStatementsMode(bool state)
  *
  * @param state        true = convert, false = don't convert.
  */
-void ASFormatter::setTabSpaceConversionMode(bool state)
+void TRFormatter::setTabSpaceConversionMode(bool state)
 {
 	shouldConvertTabs = state;
 }
@@ -1802,7 +1801,7 @@ void ASFormatter::setTabSpaceConversionMode(bool state)
  *
  * @param state        true = indent, false = don't indent.
  */
-void ASFormatter::setIndentCol1CommentsMode(bool state)
+void TRFormatter::setIndentCol1CommentsMode(bool state)
 {
 	shouldIndentCol1Comments = state;
 }
@@ -1812,7 +1811,7 @@ void ASFormatter::setIndentCol1CommentsMode(bool state)
  *
  * @param fmt           format enum value
  */
-void ASFormatter::setLineEndFormat(LineEndFormat fmt)
+void TRFormatter::setLineEndFormat(LineEndFormat fmt)
 {
 	lineEnd = fmt;
 }
@@ -1822,7 +1821,7 @@ void ASFormatter::setLineEndFormat(LineEndFormat fmt)
  *
  * @param state        true = convert, false = don't convert.
  */
-void ASFormatter::setBreakBlocksMode(bool state)
+void TRFormatter::setBreakBlocksMode(bool state)
 {
 	shouldBreakBlocks = state;
 }
@@ -1832,7 +1831,7 @@ void ASFormatter::setBreakBlocksMode(bool state)
  *
  * @param state        true = convert, false = don't convert.
  */
-void ASFormatter::setBreakClosingHeaderBlocksMode(bool state)
+void TRFormatter::setBreakClosingHeaderBlocksMode(bool state)
 {
 	shouldBreakClosingHeaderBlocks = state;
 }
@@ -1842,7 +1841,7 @@ void ASFormatter::setBreakClosingHeaderBlocksMode(bool state)
  *
  * @param state        true = delete, false = don't delete.
  */
-void ASFormatter::setDeleteEmptyLinesMode(bool state)
+void TRFormatter::setDeleteEmptyLinesMode(bool state)
 {
 	shouldDeleteEmptyLines = state;
 }
@@ -1852,12 +1851,12 @@ void ASFormatter::setDeleteEmptyLinesMode(bool state)
  *
  * @param alignment    the pointer alignment.
  */
-void ASFormatter::setPointerAlignment(PointerAlign alignment)
+void TRFormatter::setPointerAlignment(PointerAlign alignment)
 {
 	pointerAlignment = alignment;
 }
 
-void ASFormatter::setReferenceAlignment(ReferenceAlign alignment)
+void TRFormatter::setReferenceAlignment(ReferenceAlign alignment)
 {
 	referenceAlignment = alignment;
 }
@@ -1867,7 +1866,7 @@ void ASFormatter::setReferenceAlignment(ReferenceAlign alignment)
  *
  * @param i       the number of characters to jump over.
  */
-void ASFormatter::goForward(int i)
+void TRFormatter::goForward(int i)
 {
 	while (--i >= 0)
 		getNextChar();
@@ -1878,7 +1877,7 @@ void ASFormatter::goForward(int i)
  *
  * @return     the next unread character.
  */
-char ASFormatter::peekNextChar() const
+char TRFormatter::peekNextChar() const
 {
 	char ch = ' ';
 	size_t peekNum = currentLine.find_first_not_of(" \t", charNum + 1);
@@ -1896,7 +1895,7 @@ char ASFormatter::peekNextChar() const
  *
  * @return     is before a comment.
  */
-bool ASFormatter::isBeforeComment() const
+bool TRFormatter::isBeforeComment() const
 {
 	bool foundComment = false;
 	size_t peekNum = currentLine.find_first_not_of(" \t", charNum + 1);
@@ -1914,7 +1913,7 @@ bool ASFormatter::isBeforeComment() const
  *
  * @return     is before a comment or line-comment.
  */
-bool ASFormatter::isBeforeAnyComment() const
+bool TRFormatter::isBeforeAnyComment() const
 {
 	bool foundComment = false;
 	size_t peekNum = currentLine.find_first_not_of(" \t", charNum + 1);
@@ -1934,7 +1933,7 @@ bool ASFormatter::isBeforeAnyComment() const
  *
  * @return     is before a comment or line-comment.
  */
-bool ASFormatter::isBeforeAnyLineEndComment(int startPos) const
+bool TRFormatter::isBeforeAnyLineEndComment(int startPos) const
 {
 	bool foundLineEndComment = false;
 	size_t peekNum = currentLine.find_first_not_of(" \t", startPos + 1);
@@ -1963,7 +1962,7 @@ bool ASFormatter::isBeforeAnyLineEndComment(int startPos) const
  *
  * @return     is before a multiple line-end comment.
  */
-bool ASFormatter::isBeforeMultipleLineEndComments(int startPos) const
+bool TRFormatter::isBeforeMultipleLineEndComments(int startPos) const
 {
 	bool foundMultipleLineEndComment = false;
 	size_t peekNum = currentLine.find_first_not_of(" \t", startPos + 1);
@@ -1993,7 +1992,7 @@ bool ASFormatter::isBeforeMultipleLineEndComments(int startPos) const
  *
  * @return   whether succeeded to receive the new character.
  */
-bool ASFormatter::getNextChar()
+bool TRFormatter::getNextChar()
 {
 	isInLineBreak = false;
 	previousChar = currentChar;
@@ -2031,7 +2030,7 @@ bool ASFormatter::getNextChar()
  * @param sequence         the sequence to append.
  * @return   whether succeeded in reading the next line.
  */
-bool ASFormatter::getNextLine(bool emptyLineWasDeleted /*false*/)
+bool TRFormatter::getNextLine(bool emptyLineWasDeleted /*false*/)
 {
 	if (sourceIterator->hasMoreLines())
 	{
@@ -2141,7 +2140,7 @@ bool ASFormatter::getNextLine(bool emptyLineWasDeleted /*false*/)
  * jump over the leading white space in the current line,
  * IF the line does not begin a comment or is in a preprocessor definition.
  */
-void ASFormatter::initNewLine()
+void TRFormatter::initNewLine()
 {
 	size_t len = currentLine.length();
 	size_t tabSize = getTabLength();
@@ -2260,7 +2259,7 @@ void ASFormatter::initNewLine()
  * @param char             the character to append.
  * @param canBreakLine     if true, a registered line-break
  */
-void ASFormatter::appendChar(char ch, bool canBreakLine)
+void TRFormatter::appendChar(char ch, bool canBreakLine)
 {
 	if (canBreakLine && isInLineBreak)
 		breakLine();
@@ -2285,7 +2284,7 @@ void ASFormatter::appendChar(char ch, bool canBreakLine)
  * @param sequence         the sequence to append.
  * @param canBreakLine     if true, a registered line-break
  */
-void ASFormatter::appendSequence(const string &sequence, bool canBreakLine)
+void TRFormatter::appendSequence(const string &sequence, bool canBreakLine)
 {
 	if (canBreakLine && isInLineBreak)
 		breakLine();
@@ -2301,7 +2300,7 @@ void ASFormatter::appendSequence(const string &sequence, bool canBreakLine)
  * @param sequence         the sequence to append.
  * @param canBreakLine     if true, a registered line-break
  */
-void ASFormatter::appendOperator(const string &sequence, bool canBreakLine)
+void TRFormatter::appendOperator(const string &sequence, bool canBreakLine)
 {
 	if (canBreakLine && isInLineBreak)
 		breakLine();
@@ -2320,7 +2319,7 @@ void ASFormatter::appendOperator(const string &sequence, bool canBreakLine)
  * append a space to the current formattedline, UNLESS the
  * last character is already a white-space character.
  */
-void ASFormatter::appendSpacePad()
+void TRFormatter::appendSpacePad()
 {
 	int len = formattedLine.length();
 	if (len > 0 && !isWhiteSpace(formattedLine[len - 1]))
@@ -2342,7 +2341,7 @@ void ASFormatter::appendSpacePad()
  * append a space to the current formattedline, UNLESS the
  * next character is already a white-space character.
  */
-void ASFormatter::appendSpaceAfter()
+void TRFormatter::appendSpaceAfter()
 {
 	int len = currentLine.length();
 	if (charNum + 1 < len && !isWhiteSpace(currentLine[charNum + 1]))
@@ -2363,7 +2362,7 @@ void ASFormatter::appendSpaceAfter()
 /**
  * register a line break for the formatted line.
  */
-void ASFormatter::breakLine(bool isSplitLine /*false*/)
+void TRFormatter::breakLine(bool isSplitLine /*false*/)
 {
 	isLineReady = true;
 	isInLineBreak = false;
@@ -2400,7 +2399,7 @@ void ASFormatter::breakLine(bool isSplitLine /*false*/)
  *
  * @return    the type of the opened block.
  */
-BracketType ASFormatter::getBracketType()
+BracketType TRFormatter::getBracketType()
 {
 	assert(currentChar == '{');
 
@@ -2466,7 +2465,7 @@ BracketType ASFormatter::getBracketType()
  *
  * @return        whether line is empty
  */
-bool ASFormatter::isEmptyLine(const string &line) const
+bool TRFormatter::isEmptyLine(const string &line) const
 {
 	return line.find_first_not_of(" \t") == string::npos;
 }
@@ -2476,7 +2475,7 @@ bool ASFormatter::isEmptyLine(const string &line) const
  *
  * @return        whether the statement is extern "C"
  */
-bool ASFormatter::isExternC() const
+bool TRFormatter::isExternC() const
 {
 	// charNum should be at 'extern'
 	assert(!isWhiteSpace(currentLine[charNum]));
@@ -2500,7 +2499,7 @@ bool ASFormatter::isExternC() const
  *
  * @return        whether current character is a reference-or-pointer
  */
-bool ASFormatter::isPointerOrReference() const
+bool TRFormatter::isPointerOrReference() const
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 
@@ -2629,7 +2628,7 @@ bool ASFormatter::isPointerOrReference() const
  *
  * @return        whether current character is a dereference or address of
  */
-bool ASFormatter::isDereferenceOrAddressOf() const
+bool TRFormatter::isDereferenceOrAddressOf() const
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 
@@ -2710,7 +2709,7 @@ bool ASFormatter::isDereferenceOrAddressOf() const
  *
  * @return        whether current character is centered.
  */
-bool ASFormatter::isPointerOrReferenceCentered() const
+bool TRFormatter::isPointerOrReferenceCentered() const
 {
 	assert(currentLine[charNum] == '*' || currentLine[charNum] == '&' || currentLine[charNum] == '^');
 
@@ -2754,7 +2753,7 @@ bool ASFormatter::isPointerOrReferenceCentered() const
  *
  * @return        whether word is a pointer or reference variable.
  */
-bool ASFormatter::isPointerOrReferenceVariable(string &word) const
+bool TRFormatter::isPointerOrReferenceVariable(string &word) const
 {
 	if (word == "char"
 	        || word ==  "int"
@@ -2774,7 +2773,7 @@ bool ASFormatter::isPointerOrReferenceVariable(string &word) const
  *
  * @return        whether the current '+' or '-' is a unary operator.
  */
-bool ASFormatter::isUnaryOperator() const
+bool TRFormatter::isUnaryOperator() const
 {
 	assert(currentChar == '+' || currentChar == '-');
 
@@ -2791,7 +2790,7 @@ bool ASFormatter::isUnaryOperator() const
  *
  * @return        whether the current '+' or '-' is in an exponent.
  */
-bool ASFormatter::isInSwitchStatement() const
+bool TRFormatter::isInSwitchStatement() const
 {
 	assert(isInLineComment || isInComment);
 	if (preBracketHeaderStack->size() > 0)
@@ -2807,7 +2806,7 @@ bool ASFormatter::isInSwitchStatement() const
  *
  * @return        whether the current '+' or '-' is in an exponent.
  */
-bool ASFormatter::isInExponent() const
+bool TRFormatter::isInExponent() const
 {
 	assert(currentChar == '+' || currentChar == '-');
 
@@ -2829,7 +2828,7 @@ bool ASFormatter::isInExponent() const
  *
  * @return        the array is non in-statement
  */
-bool ASFormatter::isNonInStatementArrayBracket() const
+bool TRFormatter::isNonInStatementArrayBracket() const
 {
 	bool returnVal = false;
 	char nextChar = peekNextChar();
@@ -2856,7 +2855,7 @@ bool ASFormatter::isNonInStatementArrayBracket() const
  *             1 = one-line bracket has been reached.
  *             2 = one-line bracket has been reached and is followed by a comma.
  */
-int ASFormatter::isOneLineBlockReached(string &line, int startChar) const
+int TRFormatter::isOneLineBlockReached(string &line, int startChar) const
 {
 	assert(line[startChar] == '{');
 
@@ -2936,30 +2935,12 @@ int ASFormatter::isOneLineBlockReached(string &line, int startChar) const
 }
 
 /**
- * peek at the next char to determine if it is an opening bracket.
- * will look ahead in the input file if necessary.
- * this determines a java static constructor.
- *
- * @param       char position on currentLine to start the search
- * @return      true if the next word is an opening bracket.
- */
-bool ASFormatter::isNextCharOpeningBracket(int startChar) const
-{
-	bool retVal = false;
-	string nextText = peekNextText(currentLine.substr(startChar));
-	if (nextText.length() > 0
-	        && nextText.compare(0, 1, "{") == 0)
-		retVal = true;
-	return retVal;
-}
-
-/**
  * get the next non-whitespace substring on following lines, bypassing all comments.
  *
  * @param   the first line to check
  * @return  the next non-whitespace substring.
  */
-string ASFormatter::peekNextText(const string &firstLine, bool endOnEmptyLine /*false*/, bool shouldReset /*false*/) const
+string TRFormatter::peekNextText(const string &firstLine, bool endOnEmptyLine /*false*/, bool shouldReset /*false*/) const
 {
 	bool isFirstLine = true;
 	bool needReset = shouldReset;
@@ -3025,7 +3006,7 @@ string ASFormatter::peekNextText(const string &firstLine, bool endOnEmptyLine /*
  * the spaces are added or deleted to formattedLine
  * spacePadNum contains the adjustment
  */
-void ASFormatter::adjustComments(void)
+void TRFormatter::adjustComments(void)
 {
 	assert(spacePadNum != 0);
 	assert(currentLine.compare(charNum, 2, "//") == 0
@@ -3073,7 +3054,7 @@ void ASFormatter::adjustComments(void)
  * currentChar contains the bracket, it will be appended to formattedLine
  * formattedLineCommentNum is the comment location on formattedLine
  */
-void ASFormatter::appendCharInsideComments(void)
+void TRFormatter::appendCharInsideComments(void)
 {
 	if (formattedLineCommentNum == string::npos)    // does the comment start on the previous line?
 	{
@@ -3116,7 +3097,7 @@ void ASFormatter::appendCharInsideComments(void)
  *
  * @param *newOperator     the operator to be padded
  */
-void ASFormatter::padOperators(const string* newOperator)
+void TRFormatter::padOperators(const string* newOperator)
 {
 	assert(shouldPadOperators);
 	assert(newOperator != NULL);
@@ -3146,12 +3127,12 @@ void ASFormatter::padOperators(const string* newOperator)
 	                  && !((isInTemplate || isImmediatelyPostTemplate)
 	                       && (newOperator == &AS_LS || newOperator == &AS_GR))
 	                  && !(newOperator == &AS_GCC_MIN_ASSIGN
-	                       && ASBase::peekNextChar(currentLine, charNum + 1) == '>')
+	                       && TRBase::peekNextChar(currentLine, charNum + 1) == '>')
 	                  && !(newOperator == &AS_GR && previousNonWSChar == '?')
 	                  && !(newOperator == &AS_QUESTION			// check for Java wildcard
 	                       && (previousNonWSChar == '<'
-	                           || ASBase::peekNextChar(currentLine, charNum) == '>'
-	                           || ASBase::peekNextChar(currentLine, charNum) == '.'))
+	                           || TRBase::peekNextChar(currentLine, charNum) == '>'
+	                           || TRBase::peekNextChar(currentLine, charNum) == '.'))
 	                  && !isInCase
 	                  && !isInAsm
 	                  && !isInAsmOneLine
@@ -3199,7 +3180,7 @@ void ASFormatter::padOperators(const string* newOperator)
  * NOTE: Do NOT use appendCurrentChar() in this method. The line should not be
  *       broken once the calculation starts.
  */
-void ASFormatter::formatPointerOrReference(void)
+void TRFormatter::formatPointerOrReference(void)
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isCStyle());
@@ -3271,7 +3252,7 @@ void ASFormatter::formatPointerOrReference(void)
 /**
  * format pointer or reference with align to type
  */
-void ASFormatter::formatPointerOrReferenceToType()
+void TRFormatter::formatPointerOrReferenceToType()
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isCStyle());
@@ -3327,7 +3308,7 @@ void ASFormatter::formatPointerOrReferenceToType()
 /**
  * format pointer or reference with align in the middle
  */
-void ASFormatter::formatPointerOrReferenceToMiddle()
+void TRFormatter::formatPointerOrReferenceToMiddle()
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isCStyle());
@@ -3446,7 +3427,7 @@ void ASFormatter::formatPointerOrReferenceToMiddle()
 /**
  * format pointer or reference with align to name
  */
-void ASFormatter::formatPointerOrReferenceToName()
+void TRFormatter::formatPointerOrReferenceToName()
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isCStyle());
@@ -3563,7 +3544,7 @@ void ASFormatter::formatPointerOrReferenceToName()
  *       are processed as a cast (e.g. void foo(void*, void*))
  *       is processed here.
  */
-void ASFormatter::formatPointerOrReferenceCast(void)
+void TRFormatter::formatPointerOrReferenceCast(void)
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isCStyle());
@@ -3627,7 +3608,7 @@ void ASFormatter::formatPointerOrReferenceCast(void)
  * the parens and necessary padding will be appended to formattedLine
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::padParens(void)
+void TRFormatter::padParens(void)
 {
 	assert(shouldPadParensOutside || shouldPadParensInside || shouldUnPadParens || shouldPadFirstParen);
 	assert(currentChar == '(' || currentChar == ')');
@@ -3826,7 +3807,7 @@ void ASFormatter::padParens(void)
  *
  * @param bracketType    the type of bracket to be formatted.
  */
-void ASFormatter::formatOpeningBracket(BracketType bracketType)
+void TRFormatter::formatOpeningBracket(BracketType bracketType)
 {
 	assert(!isBracketType(bracketType, ARRAY_TYPE));
 	assert(currentChar == '{');
@@ -3961,7 +3942,7 @@ void ASFormatter::formatOpeningBracket(BracketType bracketType)
  *
  * @param bracketType    the type of the opening bracket for this closing bracket.
  */
-void ASFormatter::formatClosingBracket(BracketType bracketType)
+void TRFormatter::formatClosingBracket(BracketType bracketType)
 {
 	assert(!isBracketType(bracketType, ARRAY_TYPE));
 	assert(currentChar == '}');
@@ -3999,7 +3980,7 @@ void ASFormatter::formatClosingBracket(BracketType bracketType)
 		}
 	}
 	else if ((!(previousCommandChar == '{' && isPreviousBracketBlockRelated))	// this '}' does not close an empty block
-	         && isOkToBreakBlock(bracketType))									// astyle is allowed to break one line blocks
+	         && isOkToBreakBlock(bracketType))									// TaaRRule is allowed to break one line blocks
 	{
 		breakLine();
 		appendCurrentChar();
@@ -4041,7 +4022,7 @@ void ASFormatter::formatClosingBracket(BracketType bracketType)
  * @param bracketType            the type of bracket to be formatted, must be an ARRAY_TYPE.
  * @param isOpeningArrayBracket  indicates if this is the opening bracket for the array block.
  */
-void ASFormatter::formatArrayBrackets(BracketType bracketType, bool isOpeningArrayBracket)
+void TRFormatter::formatArrayBrackets(BracketType bracketType, bool isOpeningArrayBracket)
 {
 	assert(isBracketType(bracketType, ARRAY_TYPE));
 	assert(currentChar == '{' || currentChar == '}');
@@ -4212,7 +4193,7 @@ void ASFormatter::formatArrayBrackets(BracketType bracketType, bool isOpeningArr
  * determine if a run-in can be attached.
  * if it can insert the indents in formattedLine and reset the current line break.
  */
-void ASFormatter::formatRunIn()
+void TRFormatter::formatRunIn()
 {
 	assert(bracketFormatMode == RUN_IN_MODE || bracketFormatMode == NONE_MODE);
 
@@ -4319,7 +4300,7 @@ void ASFormatter::formatRunIn()
 /**
  * remove whitepace and add indentation for an array run-in.
  */
-void ASFormatter::formatArrayRunIn()
+void TRFormatter::formatArrayRunIn()
 {
 	assert(isBracketType(bracketTypeStack->back(), ARRAY_TYPE));
 
@@ -4355,7 +4336,7 @@ void ASFormatter::formatArrayRunIn()
  * delete a bracketTypeStack vector object
  * BracketTypeStack did not work with the DeleteContainer template
  */
-void ASFormatter::deleteContainer(vector<BracketType>* &container)
+void TRFormatter::deleteContainer(vector<BracketType>* &container)
 {
 	if (container != NULL)
 	{
@@ -4371,7 +4352,7 @@ void ASFormatter::deleteContainer(vector<BracketType>* &container)
  * used for all vectors except bracketTypeStack
  */
 template<typename T>
-void ASFormatter::deleteContainer(T &container)
+void TRFormatter::deleteContainer(T &container)
 {
 	if (container != NULL)
 	{
@@ -4385,7 +4366,7 @@ void ASFormatter::deleteContainer(T &container)
  * initialize a BracketType vector object
  * BracketType did not work with the DeleteContainer template
  */
-void ASFormatter::initContainer(vector<BracketType>* &container, vector<BracketType>* value)
+void TRFormatter::initContainer(vector<BracketType>* &container, vector<BracketType>* value)
 {
 	if (container != NULL)
 		deleteContainer(container);
@@ -4398,9 +4379,9 @@ void ASFormatter::initContainer(vector<BracketType>* &container, vector<BracketT
  * used for all vectors except bracketTypeStack
  */
 template<typename T>
-void ASFormatter::initContainer(T &container, T value)
+void TRFormatter::initContainer(T &container, T value)
 {
-	// since the ASFormatter object is never deleted,
+	// since the TRFormatter object is never deleted,
 	// the existing vectors must be deleted before creating new ones
 	if (container != NULL)
 		deleteContainer(container);
@@ -4415,7 +4396,7 @@ void ASFormatter::initContainer(T &container, T value)
  * replaces the tab in currentLine with the required number of spaces.
  * replaces the value of currentChar.
  */
-void ASFormatter::convertTabToSpaces()
+void TRFormatter::convertTabToSpaces()
 {
 	assert(currentLine[charNum] == '\t');
 
@@ -4432,7 +4413,7 @@ void ASFormatter::convertTabToSpaces()
 /**
 * is it ok to break this block?
 */
-bool ASFormatter::isOkToBreakBlock(BracketType bracketType) const
+bool TRFormatter::isOkToBreakBlock(BracketType bracketType) const
 {
 	// Actually, there should not be an ARRAY_TYPE bracket here.
 	// But this will avoid breaking a one line block when there is.
@@ -4452,7 +4433,7 @@ bool ASFormatter::isOkToBreakBlock(BracketType bracketType) const
  * firstLine must contain the start of the comment.
  * return value is a pointer to the header or NULL.
  */
-const string* ASFormatter::checkForHeaderFollowingComment(const string &firstLine) const
+const string* TRFormatter::checkForHeaderFollowingComment(const string &firstLine) const
 {
 	assert(isInComment || isInLineComment);
 	assert(shouldBreakElseIfs || shouldBreakBlocks || isInSwitchStatement());
@@ -4475,7 +4456,7 @@ const string* ASFormatter::checkForHeaderFollowingComment(const string &firstLin
  * delete bracketTypeStack entries added by #if if a #else is found.
  * prevents double entries in the bracketTypeStack.
  */
-void ASFormatter::processPreprocessor()
+void TRFormatter::processPreprocessor()
 {
 	assert(currentChar == '#');
 
@@ -4505,7 +4486,7 @@ void ASFormatter::processPreprocessor()
  * determine if the next line starts a comment
  * and a header follows the comment or comments.
  */
-bool ASFormatter::commentAndHeaderFollows()
+bool TRFormatter::commentAndHeaderFollows()
 {
 	// called ONLY IF shouldDeleteEmptyLines and shouldBreakBlocks are TRUE.
 	assert(shouldDeleteEmptyLines && shouldBreakBlocks);
@@ -4549,7 +4530,7 @@ bool ASFormatter::commentAndHeaderFollows()
  * the last bracket in the bracketTypeStack is the one being formatted
  * returns true if the bracket should be broken
  */
-bool ASFormatter::isCurrentBracketBroken() const
+bool TRFormatter::isCurrentBracketBroken() const
 {
 	assert(bracketTypeStack->size() > 1);
 
@@ -4640,7 +4621,7 @@ bool ASFormatter::isCurrentBracketBroken() const
  * format comment body
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatCommentBody()
+void TRFormatter::formatCommentBody()
 {
 	assert(isInComment);
 
@@ -4667,7 +4648,7 @@ void ASFormatter::formatCommentBody()
  * the comment opener will be appended to the current formattedLine or a new formattedLine as necessary
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatCommentOpener()
+void TRFormatter::formatCommentOpener()
 {
 	assert(isSequenceReached("/*"));
 
@@ -4759,7 +4740,7 @@ void ASFormatter::formatCommentOpener()
  * format a comment closer
  * the comment closer will be appended to the current formattedLine
  */
-void ASFormatter::formatCommentCloser()
+void TRFormatter::formatCommentCloser()
 {
 	isInComment = false;
 	noTrimCommentContinuation = false;
@@ -4784,7 +4765,7 @@ void ASFormatter::formatCommentCloser()
  * format a line comment body
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatLineCommentBody()
+void TRFormatter::formatLineCommentBody()
 {
 	assert(isInLineComment);
 
@@ -4814,7 +4795,7 @@ void ASFormatter::formatLineCommentBody()
  * the line comment opener will be appended to the current formattedLine or a new formattedLine as necessary
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatLineCommentOpener()
+void TRFormatter::formatLineCommentOpener()
 {
 	assert(isSequenceReached("//"));
 
@@ -4941,7 +4922,7 @@ void ASFormatter::formatLineCommentOpener()
  * format quote body
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatQuoteBody()
+void TRFormatter::formatQuoteBody()
 {
 	assert(isInQuote);
 
@@ -4996,7 +4977,7 @@ void ASFormatter::formatQuoteBody()
  * the quote opener will be appended to the current formattedLine or a new formattedLine as necessary
  * the calling function should have a continue statement after calling this method
  */
-void ASFormatter::formatQuoteOpener()
+void TRFormatter::formatQuoteOpener()
 {
 	assert(currentChar == '"' || currentChar == '\'');
 
@@ -5040,7 +5021,7 @@ void ASFormatter::formatQuoteOpener()
  * the bracket must be on the same line as the closing header.
  * i.e "} else" changed to "} \n else".
  */
-int ASFormatter::getNextLineCommentAdjustment()
+int TRFormatter::getNextLineCommentAdjustment()
 {
 	assert(foundClosingHeader && previousNonWSChar == '}');
 	if (charNum < 1)			// "else" is in column 1
@@ -5052,7 +5033,7 @@ int ASFormatter::getNextLineCommentAdjustment()
 }
 
 // for console build only
-LineEndFormat ASFormatter::getLineEndFormat() const
+LineEndFormat TRFormatter::getLineEndFormat() const
 {
 	return lineEnd;
 }
@@ -5064,7 +5045,7 @@ LineEndFormat ASFormatter::getLineEndFormat() const
  * the adjustment is 2 chars, one for the bracket and one for the space.
  * i.e "} \n else" changed to "} else".
  */
-int ASFormatter::getCurrentLineCommentAdjustment()
+int TRFormatter::getCurrentLineCommentAdjustment()
 {
 	assert(foundClosingHeader && previousNonWSChar == '}');
 	if (charNum < 1)
@@ -5081,7 +5062,7 @@ int ASFormatter::getCurrentLineCommentAdjustment()
  *
  * @return is the previous word or an empty string if none found.
  */
-string ASFormatter::getPreviousWord(const string &line, int currPos) const
+string TRFormatter::getPreviousWord(const string &line, int currPos) const
 {
 	// get the last legal word (may be a number)
 	if (currPos == 0)
@@ -5107,7 +5088,7 @@ string ASFormatter::getPreviousWord(const string &line, int currPos) const
  * is followed by a closing header.
  * the break depends on the bracketFormatMode and other factors.
  */
-void ASFormatter::isLineBreakBeforeClosingHeader()
+void TRFormatter::isLineBreakBeforeClosingHeader()
 {
 	assert(foundClosingHeader && previousNonWSChar == '}');
 	if (bracketFormatMode == BREAK_MODE
@@ -5171,7 +5152,7 @@ void ASFormatter::isLineBreakBeforeClosingHeader()
  * Brackets are not added if the proper conditions are not met.
  * Brackets are added to the currentLine.
  */
-bool ASFormatter::addBracketsToStatement()
+bool TRFormatter::addBracketsToStatement()
 {
 	assert(isImmediatelyPostHeader);
 
@@ -5226,7 +5207,7 @@ bool ASFormatter::addBracketsToStatement()
  * Brackets are not removed if the proper conditions are not met.
  * The first bracket is replaced by a space.
  */
-bool ASFormatter::removeBracketsFromStatement()
+bool TRFormatter::removeBracketsFromStatement()
 {
 	assert(isImmediatelyPostHeader);
 	assert(currentChar == '{');
@@ -5328,7 +5309,7 @@ bool ASFormatter::removeBracketsFromStatement()
  * @param searchStart  the start position on the line (default is 0).
  * @return the position on the line or string::npos if not found.
  */
-size_t ASFormatter::findNextChar(string &line, char searchChar, int searchStart /*0*/)
+size_t TRFormatter::findNextChar(string &line, char searchChar, int searchStart /*0*/)
 {
 	// find the next searchChar
 	size_t i;
@@ -5382,7 +5363,7 @@ size_t ASFormatter::findNextChar(string &line, char searchChar, int searchStart 
  * @param index         the current line index.
  * @return              true if the struct has access modifiers.
  */
-bool ASFormatter::isStructAccessModified(string  &firstLine, size_t index) const
+bool TRFormatter::isStructAccessModified(string  &firstLine, size_t index) const
 {
 	assert(firstLine[index] == '{');
 	assert(isCStyle());
@@ -5485,7 +5466,7 @@ bool ASFormatter::isStructAccessModified(string  &firstLine, size_t index) const
  * @param index         the current line index.
  * @return              true if the statement is EXEC SQL.
  */
-bool ASFormatter::isExecSQL(string  &line, size_t index) const
+bool TRFormatter::isExecSQL(string  &line, size_t index) const
 {
 	if (line[index] != 'e' && line[index] != 'E')	// quick check to reject most
 		return false;
@@ -5516,7 +5497,7 @@ bool ASFormatter::isExecSQL(string  &line, size_t index) const
  *
  * Updates currentLine and charNum.
  */
-void ASFormatter::trimContinuationLine()
+void TRFormatter::trimContinuationLine()
 {
 	size_t len = currentLine.length();
 	size_t tabSize = getTabLength();
@@ -5566,7 +5547,7 @@ void ASFormatter::trimContinuationLine()
  *
  * @return      true if the header is a closing header.
  */
-bool ASFormatter::isClosingHeader(const string* header) const
+bool TRFormatter::isClosingHeader(const string* header) const
 {
 	return (header == &AS_ELSE
 	        || header == &AS_CATCH
@@ -5578,7 +5559,7 @@ bool ASFormatter::isClosingHeader(const string* header) const
  * after a cast. If so it is a deference and not a multiply.
  * e.g. "(int*) *ptr" is a deference.
  */
-bool ASFormatter::isImmediatelyPostCast() const
+bool TRFormatter::isImmediatelyPostCast() const
 {
 	assert(previousNonWSChar == ')' && currentChar == '*');
 	// find preceding closing paren on currentLine or readyFormattedLine
@@ -5611,7 +5592,7 @@ bool ASFormatter::isImmediatelyPostCast() const
  * Determine if a < is a template definition or instantiation.
  * Sets the class variables isInTemplate and templateDepth.
  */
-void ASFormatter::checkIfTemplateOpener()
+void TRFormatter::checkIfTemplateOpener()
 {
 	assert(!isInTemplate && currentChar == '<');
 
@@ -5759,7 +5740,7 @@ exitFromSearch:
 		sourceIterator->peekReset();
 }
 
-void ASFormatter::updateFormattedLineSplitPoints(char appendedChar)
+void TRFormatter::updateFormattedLineSplitPoints(char appendedChar)
 {
 	assert(maxCodeLength != string::npos);
 	assert(formattedLine.length() > 0);
@@ -5863,7 +5844,7 @@ void ASFormatter::updateFormattedLineSplitPoints(char appendedChar)
 	}
 }
 
-void ASFormatter::updateFormattedLineSplitPointsOperator(const string &sequence)
+void TRFormatter::updateFormattedLineSplitPointsOperator(const string &sequence)
 {
 	assert(maxCodeLength != string::npos);
 	assert(formattedLine.length() > 0);
@@ -5958,7 +5939,7 @@ void ASFormatter::updateFormattedLineSplitPointsOperator(const string &sequence)
  * Update the split point when a pointer or reference is formatted.
  * The argument is the maximum index of the last whitespace character.
  */
-void ASFormatter::updateFormattedLineSplitPointsPointerOrReference(size_t index)
+void TRFormatter::updateFormattedLineSplitPointsPointerOrReference(size_t index)
 {
 	assert(maxCodeLength != string::npos);
 	assert(formattedLine.length() > 0);
@@ -5976,7 +5957,7 @@ void ASFormatter::updateFormattedLineSplitPointsPointerOrReference(size_t index)
 		maxWhiteSpacePending = index;
 }
 
-bool ASFormatter::isOkToSplitFormattedLine()
+bool TRFormatter::isOkToSplitFormattedLine()
 {
 	assert(maxCodeLength != string::npos);
 	// Is it OK to split the line?
@@ -6009,7 +5990,7 @@ bool ASFormatter::isOkToSplitFormattedLine()
 
 /* This is called if the option maxCodeLength is set.
  */
-void ASFormatter::testForTimeToSplitFormattedLine()
+void TRFormatter::testForTimeToSplitFormattedLine()
 {
 	//	DO NOT ASSERT maxCodeLength HERE
 	// should the line be split
@@ -6093,7 +6074,7 @@ void ASFormatter::testForTimeToSplitFormattedLine()
 	}
 }
 
-size_t ASFormatter::findFormattedLineSplitPoint() const
+size_t TRFormatter::findFormattedLineSplitPoint() const
 {
 	assert(maxCodeLength != string::npos);
 	// determine where to split
@@ -6154,7 +6135,7 @@ size_t ASFormatter::findFormattedLineSplitPoint() const
 	return splitPoint;
 }
 
-void ASFormatter::clearFormattedLineSplitPoints()
+void TRFormatter::clearFormattedLineSplitPoints()
 {
 	maxSemi = 0;
 	maxAndOr = 0;
@@ -6171,7 +6152,7 @@ void ASFormatter::clearFormattedLineSplitPoints()
 /**
  * Check if a pointer symbol (->) follows on the currentLine.
  */
-bool ASFormatter::pointerSymbolFollows() const
+bool TRFormatter::pointerSymbolFollows() const
 {
 	size_t peekNum = currentLine.find_first_not_of(" \t", charNum + 1);
 	if (peekNum == string::npos || currentLine.compare(peekNum, 2, "->") != 0)
@@ -6183,7 +6164,7 @@ bool ASFormatter::pointerSymbolFollows() const
  * Compute the input checksum.
  * This is called as an assert so it for is debug config only
  */
-bool ASFormatter::computeChecksumIn(const string &currentLine_)
+bool TRFormatter::computeChecksumIn(const string &currentLine_)
 {
 	for (size_t i = 0; i < currentLine_.length(); i++)
 		if (!isWhiteSpace(currentLine_[i]))
@@ -6195,7 +6176,7 @@ bool ASFormatter::computeChecksumIn(const string &currentLine_)
  * Adjust the input checksum for deleted chars.
  * This is called as an assert so it for is debug config only
  */
-bool ASFormatter::adjustChecksumIn(int adjustment)
+bool TRFormatter::adjustChecksumIn(int adjustment)
 {
 	checksumIn += adjustment;
 	return true;
@@ -6206,7 +6187,7 @@ bool ASFormatter::adjustChecksumIn(int adjustment)
  *
  * @return   checksumIn.
  */
-size_t ASFormatter::getChecksumIn() const
+size_t TRFormatter::getChecksumIn() const
 {
 	return checksumIn;
 }
@@ -6215,7 +6196,7 @@ size_t ASFormatter::getChecksumIn() const
  * Compute the output checksum.
  * This is called as an assert so it is for debug config only
  */
-bool ASFormatter::computeChecksumOut(const string &beautifiedLine)
+bool TRFormatter::computeChecksumOut(const string &beautifiedLine)
 {
 	for (size_t i = 0; i < beautifiedLine.length(); i++)
 		if (!isWhiteSpace(beautifiedLine[i]))
@@ -6226,7 +6207,7 @@ bool ASFormatter::computeChecksumOut(const string &beautifiedLine)
 /**
  * Return isLineReady for the final check at end of file.
  */
-bool ASFormatter::getIsLineReady() const
+bool TRFormatter::getIsLineReady() const
 {
 	return isLineReady;
 }
@@ -6236,7 +6217,7 @@ bool ASFormatter::getIsLineReady() const
  *
  * @return   checksumOut.
  */
-size_t ASFormatter::getChecksumOut() const
+size_t TRFormatter::getChecksumOut() const
 {
 	return checksumOut;
 }
@@ -6245,20 +6226,20 @@ size_t ASFormatter::getChecksumOut() const
  * Return the difference in checksums.
  * If zero all is okay.
  */
-int ASFormatter::getChecksumDiff() const
+int TRFormatter::getChecksumDiff() const
 {
 	return checksumOut - checksumIn;
 }
 
 // for unit testing
-int ASFormatter::getFormatterFileType() const
+int TRFormatter::getFormatterFileType() const
 {
 	return formatterFileType;
 }
 
 // Check if an operator follows the next word.
 // The next word must be a legal name.
-const string* ASFormatter::getFollowingOperator() const
+const string* TRFormatter::getFollowingOperator() const
 {
 	// find next word
 	size_t nextNum = currentLine.find_first_not_of(" \t", charNum + 1);
@@ -6287,7 +6268,7 @@ const string* ASFormatter::getFollowingOperator() const
 }
 
 // Check following data to determine if the current character is an array operator.
-bool ASFormatter::isArrayOperator() const
+bool TRFormatter::isArrayOperator() const
 {
 	assert(currentChar == '*' || currentChar == '&' || currentChar == '^');
 	assert(isBracketType(bracketTypeStack->back(), ARRAY_TYPE));
@@ -6319,7 +6300,7 @@ bool ASFormatter::isArrayOperator() const
 }
 
 // Reset the flags that indicate various statement information.
-void ASFormatter::resetEndOfStatement()
+void TRFormatter::resetEndOfStatement()
 {
 	foundQuestionMark = false;
 	foundNamespaceHeader = false;
@@ -6343,7 +6324,7 @@ void ASFormatter::resetEndOfStatement()
 }
 
 // pad an Objective-C method colon
-void ASFormatter::padObjCMethodColon()
+void TRFormatter::padObjCMethodColon()
 {
 	assert(currentChar == ':');
 	char nextChar = peekNextChar();
@@ -6386,7 +6367,7 @@ void ASFormatter::padObjCMethodColon()
 }
 
 // Remove the leading '*' from a comment line and indent to the next tab.
-void ASFormatter::stripCommentPrefix()
+void TRFormatter::stripCommentPrefix()
 {
 	int firstChar = formattedLine.find_first_not_of(" \t");
 	if (firstChar < 0)
@@ -6484,4 +6465,4 @@ void ASFormatter::stripCommentPrefix()
 	}
 }
 
-}   // end namespace astyle
+}   // end namespace TaaRRule

@@ -1,73 +1,42 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: astyle.h
+ *	@File	: TaaRRule.h
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#ifndef ASTYLE_H
-#define ASTYLE_H
+#ifndef __TAARRULE_H__
+#define __TAARRULE_H__
 
-#ifdef __VMS
-#define __USE_STD_IOSTREAM 1
-#include <assert>
-#else
 #include <cassert>
-#endif
-
 #include <cctype>
-#include <iostream>		// for cout
+#include <iostream>
 #include <string>
 #include <vector>
 
 #if defined(__GNUC__)
-#include <string.h>		// need both string and string.h for GCC
+	#include <string.h>		// need both string and string.h for GCC
 #endif
 
 // define STDCALL and EXPORT for Windows
 // MINGW defines STDCALL in Windows.h (actually windef.h)
-// EXPORT has no value for Visual C if ASTYLE_NO_VCX (no VC Exports) is defined
-#ifdef _WIN32
-#ifndef STDCALL
-#define STDCALL __stdcall
-#endif
-#if defined(_MSC_VER) && defined(ASTYLE_NO_VCX)
-#define EXPORT
-#else
-#define EXPORT __declspec(dllexport)
-#endif
 // define STDCALL and EXPORT for non-Windows
-#else
-#define STDCALL
+#ifndef STDCALL
+	#define STDCALL __stdcall
+#endif
 #define EXPORT
-#endif	// #ifdef _WIN32
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4996)  // secure version deprecation warnings
 #pragma warning(disable: 4267)  // 64 bit signed/unsigned loss of data
 #endif
 
-#ifdef __BORLANDC__
-#pragma warn -8004	// variable is assigned a value that is never used
-#endif
-
-#ifdef __INTEL_COMPILER
-#pragma warning(disable:  383)  // value copied to temporary, reference to temporary used
-// #pragma warning(disable:  444)  // destructor for base class is not virtual
-#pragma warning(disable:  981)  // operands are evaluated in unspecified order
-#endif
-
 using namespace std;
 
-namespace astyle {
-
+namespace TaaRRule {
 enum FileType { C_TYPE = 0 };
-
-/* The enums below are not recognized by 'vectors' in Microsoft Visual C++
-   V5 when they are part of a namespace!!!  Use Visual C++ V6 or higher.
-*/
 enum FormatStyle
 {
 	STYLE_NONE,
@@ -168,18 +137,18 @@ enum LineEndFormat
 
 
 //-----------------------------------------------------------------------------
-// Class ASSourceIterator
-// A pure virtual class is used by ASFormatter and ASBeautifier instead of
-// ASStreamIterator. This allows programs using AStyle as a plugin to define
-// their own ASStreamIterator. The ASStreamIterator class must inherit
+// Class TRSourceIterator
+// A pure virtual class is used by TRFormatter and ASBeautifier instead of
+// TRStreamIterator. This allows programs using AStyle as a plugin to define
+// their own TRStreamIterator. The TRStreamIterator class must inherit
 // this class.
 //-----------------------------------------------------------------------------
 
-class ASSourceIterator
+class TRSourceIterator
 {
 	public:
-		ASSourceIterator() {}
-		virtual ~ASSourceIterator() {}
+		TRSourceIterator() {}
+		virtual ~TRSourceIterator() {}
 		virtual bool hasMoreLines() const = 0;
 		virtual string nextLine(bool emptyLineWasDeleted = false) = 0;
 		virtual string peekNextLine() = 0;
@@ -187,14 +156,14 @@ class ASSourceIterator
 };
 
 //-----------------------------------------------------------------------------
-// Class ASResource
+// Class TRResource
 //-----------------------------------------------------------------------------
 
-class ASResource
+class TRResource
 {
 	public:
-		ASResource() {}
-		virtual ~ASResource() {}
+		TRResource() {}
+		virtual ~TRResource() {}
 		void buildAssignmentOperators(vector<const string*>* assignmentOperators);
 		void buildCastOperators(vector<const string*>* castOperators);
 		void buildHeaders(vector<const string*>* headers, bool beautifier = false);
@@ -244,23 +213,23 @@ class ASResource
 		static const string AS_DELEGATE, AS_UNCHECKED;
 		static const string AS_CONST_CAST, AS_DYNAMIC_CAST, AS_REINTERPRET_CAST, AS_STATIC_CAST;
 		static const string AS_NS_DURING, AS_NS_HANDLER;
-};  // Class ASResource
+};  // Class TRResource
 
 //-----------------------------------------------------------------------------
-// Class ASBase
+// Class TRBase
 //-----------------------------------------------------------------------------
 
-class ASBase
+class TRBase
 {
 	private:
 		// all variables should be set by the "init" function
 		int baseFileType;      // a value from enum FileType
 
 	protected:
-		ASBase() : baseFileType(C_TYPE) { }
-		virtual ~ASBase() {}
+		TRBase() : baseFileType(C_TYPE) { }
+		virtual ~TRBase() {}
 
-		// functions definitions are at the end of ASResource.cpp
+		// functions definitions are at the end of TRResource.cpp
 		bool findKeyword(const string &line, int i, const string &keyword) const;
 		string getCurrentWord(const string &line, size_t index) const;
 
@@ -317,18 +286,18 @@ class ASBase
 			ch = line[peekNum];
 			return ch;
 		}
-};  // Class ASBase
+};  // Class TRBase
 
 //-----------------------------------------------------------------------------
 // Class ASBeautifier
 //-----------------------------------------------------------------------------
 
-class ASBeautifier : protected ASResource, protected ASBase
+class ASBeautifier : protected TRResource, protected TRBase
 {
 	public:
 		ASBeautifier();
 		virtual ~ASBeautifier();
-		virtual void init(ASSourceIterator* iter);
+		virtual void init(TRSourceIterator* iter);
 		virtual string beautify(const string &line);
 		void setCaseIndent(bool state);
 		void setClassIndent(bool state);
@@ -378,7 +347,7 @@ class ASBeautifier : protected ASResource, protected ASBase
 		string trim(const string &str) const;
 		string rtrim(const string &str) const;
 
-		// variables set by ASFormatter - must be updated in activeBeautifierStack
+		// variables set by TRFormatter - must be updated in activeBeautifierStack
 		int  inLineNumber;
 		int  horstmannIndentInStatement;
 		int  nonInStatementBracket;
@@ -449,7 +418,7 @@ class ASBeautifier : protected ASResource, protected ASBase
 		vector<int>* parenIndentStack;
 		vector<pair<int, int> >* preprocIndentStack;
 
-		ASSourceIterator* sourceIterator;
+		TRSourceIterator* sourceIterator;
 		const string* currentHeader;
 		const string* previousLastLineHeader;
 		const string* probationHeader;
@@ -538,7 +507,7 @@ class ASBeautifier : protected ASResource, protected ASBase
 // Class ASEnhancer
 //-----------------------------------------------------------------------------
 
-class ASEnhancer : protected ASBase
+class ASEnhancer : protected TRBase
 {
 	public:  // functions
 		ASEnhancer();
@@ -605,15 +574,15 @@ class ASEnhancer : protected ASBase
 };  // Class ASEnhancer
 
 //-----------------------------------------------------------------------------
-// Class ASFormatter
+// Class TRFormatter
 //-----------------------------------------------------------------------------
 
-class ASFormatter : public ASBeautifier
+class TRFormatter : public ASBeautifier
 {
 	public:	// functions
-		ASFormatter();
-		virtual ~ASFormatter();
-		virtual void init(ASSourceIterator* iter);
+		TRFormatter();
+		virtual ~TRFormatter();
+		virtual void init(TRSourceIterator* iter);
 		virtual bool hasMoreLines() const;
 		virtual string nextLine();
 		LineEndFormat getLineEndFormat() const;
@@ -658,8 +627,8 @@ class ASFormatter : public ASBeautifier
 		int  getFormatterFileType() const;
 
 	private:  // functions
-		ASFormatter(const ASFormatter &copy);       // copy constructor not to be implemented
-		ASFormatter &operator=(ASFormatter &);      // assignment operator not to be implemented
+		TRFormatter(const TRFormatter &copy);       // copy constructor not to be implemented
+		TRFormatter &operator=(TRFormatter &);      // assignment operator not to be implemented
 		template<typename T> void deleteContainer(T &container);
 		template<typename T> void initContainer(T &container, T value);
 		char peekNextChar() const;
@@ -691,7 +660,6 @@ class ASFormatter : public ASBeautifier
 		bool isImmediatelyPostCast() const;
 		bool isInExponent() const;
 		bool isInSwitchStatement() const;
-		bool isNextCharOpeningBracket(int startChar) const;
 		bool isOkToBreakBlock(BracketType bracketType) const;
 		bool pointerSymbolFollows() const;
 		int  getCurrentLineCommentAdjustment();
@@ -762,7 +730,7 @@ class ASFormatter : public ASBeautifier
 		vector<const string*>* assignmentOperators;
 		vector<const string*>* castOperators;
 
-		ASSourceIterator* sourceIterator;
+		TRSourceIterator* sourceIterator;
 		ASEnhancer* enhancer;
 
 		vector<const string*>* preBracketHeaderStack;
@@ -947,28 +915,28 @@ class ASFormatter : public ASBeautifier
 			return currentLine.compare(charNum, strlen(sequence), sequence) == 0;
 		}
 
-		// call ASBase::findHeader for the current character
+		// call TRBase::findHeader for the current character
 		const string* findHeader(const vector<const string*>* headers_) {
 			return ASBeautifier::findHeader(currentLine, charNum, headers_);
 		}
 
-		// call ASBase::findOperator for the current character
+		// call TRBase::findOperator for the current character
 		const string* findOperator(const vector<const string*>* headers_) {
 			return ASBeautifier::findOperator(currentLine, charNum, headers_);
 		}
-};  // Class ASFormatter
+};  // Class TRFormatter
 
 
 //-----------------------------------------------------------------------------
-// astyle namespace global declarations
+// TaaRRule namespace global declarations
 //-----------------------------------------------------------------------------
-// sort comparison functions for ASResource
+// sort comparison functions for TRResource
 bool sortOnLength(const string* a, const string* b);
 bool sortOnName(const string* a, const string* b);
 
-}   // end of astyle namespace
+}   // end of TaaRRule namespace
 
-// end of astyle namespace  --------------------------------------------------
+// end of TaaRRule namespace  --------------------------------------------------
 
 
 //-----------------------------------------------------------------------------
@@ -980,4 +948,4 @@ typedef void (STDCALL* fpError)(int, const char*);      // pointer to callback e
 typedef char* (STDCALL* fpAlloc)(unsigned long);		// pointer to callback memory allocation
 extern "C" EXPORT char* STDCALL AStyleMain(const char*, const char*, fpError, fpAlloc);
 
-#endif // closes ASTYLE_H
+#endif	/* __TAARRULE_H__ */

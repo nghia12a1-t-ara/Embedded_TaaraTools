@@ -1,92 +1,44 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: astyle_main.cpp
+ *	@File	: main.cpp
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#ifndef ASTYLE_MAIN_H
-#define ASTYLE_MAIN_H
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
-//----------------------------------------------------------------------------
-// headers
-//----------------------------------------------------------------------------
-
-// use this to test the Linux compile with MinGW
-#ifdef MINGW_LINUX
-#undef _WIN32
-#endif
-
-#include "astyle.h"
-
+// for console build only
+#include "TRLanguage.h"
+#include "TaaRRule.h"
 #include <sstream>
 #include <ctime>
-
-#if defined(_MSC_VER) || defined(__DMC__)
-#include <sys/utime.h>
-#include <sys/stat.h>
+#ifdef _MSC_VER
+	#include <sys/utime.h>
+	#include <sys/stat.h>
 #else
-#include <utime.h>
-#include <sys/stat.h>
-#endif                         // end compiler checks
-
-#ifdef ASTYLE_JNI
-#include <jni.h>
-#ifndef ASTYLE_LIB    // ASTYLE_LIB must be defined for ASTYLE_JNI
-#define ASTYLE_LIB
-#endif
-#endif  //  ASTYLE_JNI
-
-#ifdef ASTYLE_LIB
-// define utf-16 bit text for the platform
-#ifdef _WIN32
-typedef wchar_t utf16_t;
-#else
-typedef unsigned short utf16_t;
-#endif	// _WIN32
-#else
-// for console build only
-#include "ASLocalizer.h"
-#define _(a) localizer.settext(a)
-#endif	// ASTYLE_LIB
-
-// for G++ implementation of string.compare:
-#if defined(__GNUC__) && __GNUC__ < 3
-#error - Use GNU C compiler release 3 or higher
-#endif
-
-// for namespace problem in version 5.0
-#if defined(_MSC_VER) && _MSC_VER < 1200        // check for V6.0
-#error - Use Microsoft compiler version 6 or higher
-#endif
-
-// for mingw BOM, UTF-16, and Unicode functions
-#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
-#if (__MINGW32_MAJOR_VERSION > 3)  || ((__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 16))
-#error - Use MinGW compiler version 4 or higher
-#endif
-#endif
-
-
-namespace astyle {
+	#include <utime.h>
+	#include <sys/stat.h>
+#endif		// end compiler checks
+#define _(a)	localizer.settext(a)
 
 //----------------------------------------------------------------------------
-// ASStreamIterator class
+// TRStreamIterator class
 // typename will be istringstream for GUI and istream otherwise
-// ASSourceIterator is an abstract class defined in astyle.h
+// TRSourceIterator is an abstract class defined in TaaRRule.h
 //----------------------------------------------------------------------------
-
+namespace TaaRRule {
 template<typename T>
-class ASStreamIterator : public ASSourceIterator
+class TRStreamIterator : public TRSourceIterator
 {
 	public:
 		bool checkForEmptyLine;
 
 		// function declarations
-		ASStreamIterator(T* in);
-		virtual ~ASStreamIterator();
+		TRStreamIterator(T* in);
+		virtual ~TRStreamIterator();
 		bool getLineEndChange(int lineEndFormat) const;
 		string nextLine(bool emptyLineWasDeleted);
 		string peekNextLine();
@@ -94,8 +46,8 @@ class ASStreamIterator : public ASSourceIterator
 		void saveLastInputLine();
 
 	private:
-		ASStreamIterator(const ASStreamIterator &copy);       // copy constructor not to be imlpemented
-		ASStreamIterator &operator=(ASStreamIterator &);      // assignment operator not to be implemented
+		TRStreamIterator(const TRStreamIterator &copy);       // copy constructor not to be imlpemented
+		TRStreamIterator &operator=(TRStreamIterator &);      // assignment operator not to be implemented
 		T* inStream;           // pointer to the input stream
 		string buffer;         // current input line
 		string prevBuffer;     // previous input line
@@ -121,14 +73,14 @@ class ASStreamIterator : public ASSourceIterator
 class ASOptions
 {
 	public:
-		ASOptions(ASFormatter &formatterArg) : formatter(formatterArg) {}
+		ASOptions(TRFormatter &formatterArg) : formatter(formatterArg) {}
 		string getOptionErrors();
 		void importOptions(istream &in, vector<string> &optionsVector);
 		bool parseOptions(vector<string> &optionsVector, const string &errorInfo);
 
 	private:
 		// variables
-		ASFormatter &formatter;			// reference to the ASFormatter object
+		TRFormatter &formatter;			// reference to the TRFormatter object
 		stringstream optionErrors;		// option error messages
 
 		// functions
@@ -143,8 +95,6 @@ class ASOptions
 		void parseOption(const string &arg, const string &errorInfo);
 };
 
-#ifndef	ASTYLE_LIB
-
 //----------------------------------------------------------------------------
 // ASConsole class for console build
 //----------------------------------------------------------------------------
@@ -152,8 +102,8 @@ class ASOptions
 class ASConsole
 {
 	private:	// variables
-		ASFormatter &formatter;				// reference to the ASFormatter object
-		ASLocalizer localizer;				// ASLocalizer object
+		TRFormatter &formatter;				// reference to the TRFormatter object
+		TRLanguage localizer;				// TRLanguage object
 		// command line options
 		bool isRecursive;                   // recursive option
 		string origSuffix;                  // suffix= option
@@ -189,7 +139,7 @@ class ASConsole
 		vector<string> fileName;            // files to be processed including path
 
 	public:
-		ASConsole(ASFormatter &formatterArg) : formatter(formatterArg) {
+		ASConsole(TRFormatter &formatterArg) : formatter(formatterArg) {
 			// command line options
 			isRecursive = false;
 			origSuffix = ".orig";
@@ -293,47 +243,11 @@ class ASConsole
 		int  waitForRemove(const char* oldFileName) const;
 		int  wildcmp(const char* wild, const char* data) const;
 		void writeFile(const string &fileName_, FileEncoding encoding, ostringstream &out) const;
-#ifdef _WIN32
 		void displayLastError();
-#endif
-};
-#else	// ASTYLE_LIB
-
-//----------------------------------------------------------------------------
-// ASLibrary class for library build
-//----------------------------------------------------------------------------
-
-class ASLibrary
-{
-	public:
-		// virtual functions are mocked in testing
-		utf16_t* formatUtf16(const utf16_t*, const utf16_t*, fpError, fpAlloc) const;
-		virtual utf16_t* convertUtf8ToUtf16(const char* utf8In, fpAlloc fpMemoryAlloc) const;
-		virtual char* convertUtf16ToUtf8(const utf16_t* pSourceIn) const;
-
-	private:
-		bool getBigEndian() const;
-		int swap16bit(int value) const;
-		static char* STDCALL tempMemoryAllocation(unsigned long memoryNeeded);
-		size_t utf16len(const utf16_t* utf16In) const;
-		size_t Utf8LengthFromUtf16(const char* data, size_t tlen, bool isBigEndian) const;
-		size_t Utf16LengthFromUtf8(const char* data, size_t len) const;
 };
 
-#endif	// ASTYLE_LIB
-
 //----------------------------------------------------------------------------
 
-}   // end of namespace astyle
+}   // end of namespace TaaRRule
 
-//----------------------------------------------------------------------------
-// declarations for UTF-16 interface
-// global because they are called externally
-//----------------------------------------------------------------------------
-#ifdef ASTYLE_LIB
-extern "C"
-EXPORT utf16_t* STDCALL AStyleMainUtf16
-(const utf16_t* pSourceIn, const utf16_t* pOptions, fpError fpErrorHandler, fpAlloc fpMemoryAlloc);
-#endif	// ASTYLE_LIB
-
-#endif // closes ASTYLE_MAIN_H
+#endif /* __MAIN_H__ */

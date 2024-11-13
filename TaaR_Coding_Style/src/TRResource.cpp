@@ -1,146 +1,146 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: ASResource.cpp
+ *	@File	: TRResource.cpp
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#include "astyle.h"
+#include "TaaRRule.h"
 #include <algorithm>
 
-namespace astyle {
+namespace TaaRRule {
 
-const string ASResource::AS_IF = string("if");
-const string ASResource::AS_ELSE = string("else");
-const string ASResource::AS_FOR = string("for");
-const string ASResource::AS_DO = string("do");
-const string ASResource::AS_WHILE = string("while");
-const string ASResource::AS_SWITCH = string("switch");
-const string ASResource::AS_CASE = string("case");
-const string ASResource::AS_DEFAULT = string("default");
-const string ASResource::AS_CLASS = string("class");
-const string ASResource::AS_VOLATILE = string("volatile");
-const string ASResource::AS_STRUCT = string("struct");
-const string ASResource::AS_UNION = string("union");
-const string ASResource::AS_INTERFACE = string("interface");
-const string ASResource::AS_NAMESPACE = string("namespace");
-const string ASResource::AS_END = string("end");
-const string ASResource::AS_SELECTOR = string("selector");
-const string ASResource::AS_EXTERN = string("extern");
-const string ASResource::AS_ENUM = string("enum");
-const string ASResource::AS_PUBLIC = string("public");
-const string ASResource::AS_PROTECTED = string("protected");
-const string ASResource::AS_PRIVATE = string("private");
-const string ASResource::AS_STATIC = string("static");
-const string ASResource::AS_SYNCHRONIZED = string("synchronized");
-const string ASResource::AS_OPERATOR = string("operator");
-const string ASResource::AS_TEMPLATE = string("template");
-const string ASResource::AS_TRY = string("try");
-const string ASResource::AS_CATCH = string("catch");
-const string ASResource::AS_THROW = string("throw");
-const string ASResource::AS_FINALLY = string("finally");
-const string ASResource::_AS_TRY = string("__try");
-const string ASResource::_AS_FINALLY = string("__finally");
-const string ASResource::_AS_EXCEPT = string("__except");
-const string ASResource::AS_THROWS = string("throws");
-const string ASResource::AS_CONST = string("const");
-const string ASResource::AS_SEALED = string("sealed");
-const string ASResource::AS_OVERRIDE = string("override");
-const string ASResource::AS_WHERE = string("where");
-const string ASResource::AS_NEW = string("new");
+const string TRResource::AS_IF = string("if");
+const string TRResource::AS_ELSE = string("else");
+const string TRResource::AS_FOR = string("for");
+const string TRResource::AS_DO = string("do");
+const string TRResource::AS_WHILE = string("while");
+const string TRResource::AS_SWITCH = string("switch");
+const string TRResource::AS_CASE = string("case");
+const string TRResource::AS_DEFAULT = string("default");
+const string TRResource::AS_CLASS = string("class");
+const string TRResource::AS_VOLATILE = string("volatile");
+const string TRResource::AS_STRUCT = string("struct");
+const string TRResource::AS_UNION = string("union");
+const string TRResource::AS_INTERFACE = string("interface");
+const string TRResource::AS_NAMESPACE = string("namespace");
+const string TRResource::AS_END = string("end");
+const string TRResource::AS_SELECTOR = string("selector");
+const string TRResource::AS_EXTERN = string("extern");
+const string TRResource::AS_ENUM = string("enum");
+const string TRResource::AS_PUBLIC = string("public");
+const string TRResource::AS_PROTECTED = string("protected");
+const string TRResource::AS_PRIVATE = string("private");
+const string TRResource::AS_STATIC = string("static");
+const string TRResource::AS_SYNCHRONIZED = string("synchronized");
+const string TRResource::AS_OPERATOR = string("operator");
+const string TRResource::AS_TEMPLATE = string("template");
+const string TRResource::AS_TRY = string("try");
+const string TRResource::AS_CATCH = string("catch");
+const string TRResource::AS_THROW = string("throw");
+const string TRResource::AS_FINALLY = string("finally");
+const string TRResource::_AS_TRY = string("__try");
+const string TRResource::_AS_FINALLY = string("__finally");
+const string TRResource::_AS_EXCEPT = string("__except");
+const string TRResource::AS_THROWS = string("throws");
+const string TRResource::AS_CONST = string("const");
+const string TRResource::AS_SEALED = string("sealed");
+const string TRResource::AS_OVERRIDE = string("override");
+const string TRResource::AS_WHERE = string("where");
+const string TRResource::AS_NEW = string("new");
 
-const string ASResource::AS_ASM = string("asm");
-const string ASResource::AS__ASM__ = string("__asm__");
-const string ASResource::AS_MS_ASM = string("_asm");
-const string ASResource::AS_MS__ASM = string("__asm");
+const string TRResource::AS_ASM = string("asm");
+const string TRResource::AS__ASM__ = string("__asm__");
+const string TRResource::AS_MS_ASM = string("_asm");
+const string TRResource::AS_MS__ASM = string("__asm");
 
-const string ASResource::AS_BAR_DEFINE = string("#define");
-const string ASResource::AS_BAR_INCLUDE = string("#include");
-const string ASResource::AS_BAR_IF = string("#if");
-const string ASResource::AS_BAR_EL = string("#el");
-const string ASResource::AS_BAR_ENDIF = string("#endif");
+const string TRResource::AS_BAR_DEFINE = string("#define");
+const string TRResource::AS_BAR_INCLUDE = string("#include");
+const string TRResource::AS_BAR_IF = string("#if");
+const string TRResource::AS_BAR_EL = string("#el");
+const string TRResource::AS_BAR_ENDIF = string("#endif");
 
-const string ASResource::AS_OPEN_BRACKET = string("{");
-const string ASResource::AS_CLOSE_BRACKET = string("}");
-const string ASResource::AS_OPEN_LINE_COMMENT = string("//");
-const string ASResource::AS_OPEN_COMMENT = string("/*");
-const string ASResource::AS_CLOSE_COMMENT = string("*/");
+const string TRResource::AS_OPEN_BRACKET = string("{");
+const string TRResource::AS_CLOSE_BRACKET = string("}");
+const string TRResource::AS_OPEN_LINE_COMMENT = string("//");
+const string TRResource::AS_OPEN_COMMENT = string("/*");
+const string TRResource::AS_CLOSE_COMMENT = string("*/");
 
-const string ASResource::AS_ASSIGN = string("=");
-const string ASResource::AS_PLUS_ASSIGN = string("+=");
-const string ASResource::AS_MINUS_ASSIGN = string("-=");
-const string ASResource::AS_MULT_ASSIGN = string("*=");
-const string ASResource::AS_DIV_ASSIGN = string("/=");
-const string ASResource::AS_MOD_ASSIGN = string("%=");
-const string ASResource::AS_OR_ASSIGN = string("|=");
-const string ASResource::AS_AND_ASSIGN = string("&=");
-const string ASResource::AS_XOR_ASSIGN = string("^=");
-const string ASResource::AS_GR_GR_ASSIGN = string(">>=");
-const string ASResource::AS_LS_LS_ASSIGN = string("<<=");
-const string ASResource::AS_GR_GR_GR_ASSIGN = string(">>>=");
-const string ASResource::AS_LS_LS_LS_ASSIGN = string("<<<=");
-const string ASResource::AS_GCC_MIN_ASSIGN = string("<?");
-const string ASResource::AS_GCC_MAX_ASSIGN = string(">?");
+const string TRResource::AS_ASSIGN = string("=");
+const string TRResource::AS_PLUS_ASSIGN = string("+=");
+const string TRResource::AS_MINUS_ASSIGN = string("-=");
+const string TRResource::AS_MULT_ASSIGN = string("*=");
+const string TRResource::AS_DIV_ASSIGN = string("/=");
+const string TRResource::AS_MOD_ASSIGN = string("%=");
+const string TRResource::AS_OR_ASSIGN = string("|=");
+const string TRResource::AS_AND_ASSIGN = string("&=");
+const string TRResource::AS_XOR_ASSIGN = string("^=");
+const string TRResource::AS_GR_GR_ASSIGN = string(">>=");
+const string TRResource::AS_LS_LS_ASSIGN = string("<<=");
+const string TRResource::AS_GR_GR_GR_ASSIGN = string(">>>=");
+const string TRResource::AS_LS_LS_LS_ASSIGN = string("<<<=");
+const string TRResource::AS_GCC_MIN_ASSIGN = string("<?");
+const string TRResource::AS_GCC_MAX_ASSIGN = string(">?");
 
-const string ASResource::AS_RETURN = string("return");
-const string ASResource::AS_CIN = string("cin");
-const string ASResource::AS_COUT = string("cout");
-const string ASResource::AS_CERR = string("cerr");
+const string TRResource::AS_RETURN = string("return");
+const string TRResource::AS_CIN = string("cin");
+const string TRResource::AS_COUT = string("cout");
+const string TRResource::AS_CERR = string("cerr");
 
-const string ASResource::AS_EQUAL = string("==");
-const string ASResource::AS_PLUS_PLUS = string("++");
-const string ASResource::AS_MINUS_MINUS = string("--");
-const string ASResource::AS_NOT_EQUAL = string("!=");
-const string ASResource::AS_GR_EQUAL = string(">=");
-const string ASResource::AS_GR_GR = string(">>");
-const string ASResource::AS_GR_GR_GR = string(">>>");
-const string ASResource::AS_LS_EQUAL = string("<=");
-const string ASResource::AS_LS_LS = string("<<");
-const string ASResource::AS_LS_LS_LS = string("<<<");
-const string ASResource::AS_QUESTION_QUESTION = string("??");
-const string ASResource::AS_LAMBDA = string("=>");            // C# lambda expression arrow
-const string ASResource::AS_ARROW = string("->");
-const string ASResource::AS_AND = string("&&");
-const string ASResource::AS_OR = string("||");
-const string ASResource::AS_SCOPE_RESOLUTION = string("::");
+const string TRResource::AS_EQUAL = string("==");
+const string TRResource::AS_PLUS_PLUS = string("++");
+const string TRResource::AS_MINUS_MINUS = string("--");
+const string TRResource::AS_NOT_EQUAL = string("!=");
+const string TRResource::AS_GR_EQUAL = string(">=");
+const string TRResource::AS_GR_GR = string(">>");
+const string TRResource::AS_GR_GR_GR = string(">>>");
+const string TRResource::AS_LS_EQUAL = string("<=");
+const string TRResource::AS_LS_LS = string("<<");
+const string TRResource::AS_LS_LS_LS = string("<<<");
+const string TRResource::AS_QUESTION_QUESTION = string("??");
+const string TRResource::AS_LAMBDA = string("=>");            // C# lambda expression arrow
+const string TRResource::AS_ARROW = string("->");
+const string TRResource::AS_AND = string("&&");
+const string TRResource::AS_OR = string("||");
+const string TRResource::AS_SCOPE_RESOLUTION = string("::");
 
-const string ASResource::AS_PLUS = string("+");
-const string ASResource::AS_MINUS = string("-");
-const string ASResource::AS_MULT = string("*");
-const string ASResource::AS_DIV = string("/");
-const string ASResource::AS_MOD = string("%");
-const string ASResource::AS_GR = string(">");
-const string ASResource::AS_LS = string("<");
-const string ASResource::AS_NOT = string("!");
-const string ASResource::AS_BIT_OR = string("|");
-const string ASResource::AS_BIT_AND = string("&");
-const string ASResource::AS_BIT_NOT = string("~");
-const string ASResource::AS_BIT_XOR = string("^");
-const string ASResource::AS_QUESTION = string("?");
-const string ASResource::AS_COLON = string(":");
-const string ASResource::AS_COMMA = string(",");
-const string ASResource::AS_SEMICOLON = string(";");
+const string TRResource::AS_PLUS = string("+");
+const string TRResource::AS_MINUS = string("-");
+const string TRResource::AS_MULT = string("*");
+const string TRResource::AS_DIV = string("/");
+const string TRResource::AS_MOD = string("%");
+const string TRResource::AS_GR = string(">");
+const string TRResource::AS_LS = string("<");
+const string TRResource::AS_NOT = string("!");
+const string TRResource::AS_BIT_OR = string("|");
+const string TRResource::AS_BIT_AND = string("&");
+const string TRResource::AS_BIT_NOT = string("~");
+const string TRResource::AS_BIT_XOR = string("^");
+const string TRResource::AS_QUESTION = string("?");
+const string TRResource::AS_COLON = string(":");
+const string TRResource::AS_COMMA = string(",");
+const string TRResource::AS_SEMICOLON = string(";");
 
-const string ASResource::AS_FOREACH = string("foreach");
-const string ASResource::AS_LOCK = string("lock");
-const string ASResource::AS_UNSAFE = string("unsafe");
-const string ASResource::AS_FIXED = string("fixed");
-const string ASResource::AS_GET = string("get");
-const string ASResource::AS_SET = string("set");
-const string ASResource::AS_ADD = string("add");
-const string ASResource::AS_REMOVE = string("remove");
-const string ASResource::AS_DELEGATE = string("delegate");
-const string ASResource::AS_UNCHECKED = string("unchecked");
+const string TRResource::AS_FOREACH = string("foreach");
+const string TRResource::AS_LOCK = string("lock");
+const string TRResource::AS_UNSAFE = string("unsafe");
+const string TRResource::AS_FIXED = string("fixed");
+const string TRResource::AS_GET = string("get");
+const string TRResource::AS_SET = string("set");
+const string TRResource::AS_ADD = string("add");
+const string TRResource::AS_REMOVE = string("remove");
+const string TRResource::AS_DELEGATE = string("delegate");
+const string TRResource::AS_UNCHECKED = string("unchecked");
 
-const string ASResource::AS_CONST_CAST = string("const_cast");
-const string ASResource::AS_DYNAMIC_CAST = string("dynamic_cast");
-const string ASResource::AS_REINTERPRET_CAST = string("reinterpret_cast");
-const string ASResource::AS_STATIC_CAST = string("static_cast");
+const string TRResource::AS_CONST_CAST = string("const_cast");
+const string TRResource::AS_DYNAMIC_CAST = string("dynamic_cast");
+const string TRResource::AS_REINTERPRET_CAST = string("reinterpret_cast");
+const string TRResource::AS_STATIC_CAST = string("static_cast");
 
-const string ASResource::AS_NS_DURING = string("NS_DURING");
-const string ASResource::AS_NS_HANDLER = string("NS_HANDLER");
+const string TRResource::AS_NS_DURING = string("NS_DURING");
+const string TRResource::AS_NS_HANDLER = string("NS_HANDLER");
 
 /**
  * Sort comparison function.
@@ -167,11 +167,11 @@ bool sortOnName(const string* a, const string* b)
 
 /**
  * Build the vector of assignment operators.
- * Used by BOTH ASFormatter.cpp and ASBeautifier.cpp
+ * Used by BOTH TRFormatter.cpp and ASBeautifier.cpp
  *
  * @param assignmentOperators   a reference to the vector to be built.
  */
-void ASResource::buildAssignmentOperators(vector<const string*>* assignmentOperators)
+void TRResource::buildAssignmentOperators(vector<const string*>* assignmentOperators)
 {
 	assignmentOperators->push_back(&AS_ASSIGN);
 	assignmentOperators->push_back(&AS_PLUS_ASSIGN);
@@ -191,11 +191,11 @@ void ASResource::buildAssignmentOperators(vector<const string*>* assignmentOpera
 
 /**
  * Build the vector of C++ cast operators.
- * Used by ONLY ASFormatter.cpp
+ * Used by ONLY TRFormatter.cpp
  *
  * @param castOperators     a reference to the vector to be built.
  */
-void ASResource::buildCastOperators(vector<const string*>* castOperators)
+void TRResource::buildCastOperators(vector<const string*>* castOperators)
 {
 	castOperators->push_back(&AS_CONST_CAST);
 	castOperators->push_back(&AS_DYNAMIC_CAST);
@@ -205,11 +205,11 @@ void ASResource::buildCastOperators(vector<const string*>* castOperators)
 
 /**
  * Build the vector of header words.
- * Used by BOTH ASFormatter.cpp and ASBeautifier.cpp
+ * Used by BOTH TRFormatter.cpp and ASBeautifier.cpp
  *
  * @param headers       a reference to the vector to be built.
  */
-void ASResource::buildHeaders(vector<const string*>* headers, bool beautifier)
+void TRResource::buildHeaders(vector<const string*>* headers, bool beautifier)
 {
 	headers->push_back(&AS_IF);
 	headers->push_back(&AS_ELSE);
@@ -239,7 +239,7 @@ void ASResource::buildHeaders(vector<const string*>* headers, bool beautifier)
  *
  * @param indentableHeaders     a reference to the vector to be built.
  */
-void ASResource::buildIndentableHeaders(vector<const string*>* indentableHeaders)
+void TRResource::buildIndentableHeaders(vector<const string*>* indentableHeaders)
 {
 	indentableHeaders->push_back(&AS_RETURN);
 
@@ -252,7 +252,7 @@ void ASResource::buildIndentableHeaders(vector<const string*>* indentableHeaders
  *
  * @param nonAssignmentOperators       a reference to the vector to be built.
  */
-void ASResource::buildNonAssignmentOperators(vector<const string*>* nonAssignmentOperators)
+void TRResource::buildNonAssignmentOperators(vector<const string*>* nonAssignmentOperators)
 {
 	nonAssignmentOperators->push_back(&AS_EQUAL);
 	nonAssignmentOperators->push_back(&AS_PLUS_PLUS);
@@ -274,12 +274,12 @@ void ASResource::buildNonAssignmentOperators(vector<const string*>* nonAssignmen
 
 /**
  * Build the vector of header non-paren headers.
- * Used by BOTH ASFormatter.cpp and ASBeautifier.cpp.
+ * Used by BOTH TRFormatter.cpp and ASBeautifier.cpp.
  * NOTE: Non-paren headers should also be included in the headers vector.
  *
  * @param nonParenHeaders       a reference to the vector to be built.
  */
-void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, bool beautifier)
+void TRResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, bool beautifier)
 {
 	nonParenHeaders->push_back(&AS_ELSE);
 	nonParenHeaders->push_back(&AS_DO);
@@ -299,11 +299,11 @@ void ASResource::buildNonParenHeaders(vector<const string*>* nonParenHeaders, bo
 
 /**
  * Build the vector of operators.
- * Used by ONLY ASFormatter.cpp
+ * Used by ONLY TRFormatter.cpp
  *
  * @param operators             a reference to the vector to be built.
  */
-void ASResource::buildOperators(vector<const string*>* operators)
+void TRResource::buildOperators(vector<const string*>* operators)
 {
 	operators->push_back(&AS_PLUS_ASSIGN);
 	operators->push_back(&AS_MINUS_ASSIGN);
@@ -361,7 +361,7 @@ void ASResource::buildOperators(vector<const string*>* operators)
  *
  * @param preBlockStatements        a reference to the vector to be built.
  */
-void ASResource::buildPreBlockStatements(vector<const string*>* preBlockStatements)
+void TRResource::buildPreBlockStatements(vector<const string*>* preBlockStatements)
 {
 	preBlockStatements->push_back(&AS_CLASS);
 	preBlockStatements->push_back(&AS_STRUCT);
@@ -373,14 +373,14 @@ void ASResource::buildPreBlockStatements(vector<const string*>* preBlockStatemen
 
 /**
  * Build the vector of pre-command headers.
- * Used by BOTH ASFormatter.cpp and ASBeautifier.cpp.
+ * Used by BOTH TRFormatter.cpp and ASBeautifier.cpp.
  * NOTE: Cannot be both a header and a preCommandHeader.
  *
  * A preCommandHeader is in a function definition between
  * the closing paren and the opening bracket.
  * e.g. in "void foo() const {}", "const" is a preCommandHeader.
  */
-void ASResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders)
+void TRResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders)
 {
 	preCommandHeaders->push_back(&AS_CONST);
 	preCommandHeaders->push_back(&AS_VOLATILE);
@@ -392,13 +392,13 @@ void ASResource::buildPreCommandHeaders(vector<const string*>* preCommandHeaders
 
 /**
  * Build the vector of pre-definition headers.
- * Used by ONLY ASFormatter.cpp
+ * Used by ONLY TRFormatter.cpp
  * NOTE: Do NOT add 'enum' here. It is an array type bracket.
  * NOTE: Do NOT add 'extern' here. Do not want an extra indent.
  *
  * @param preDefinitionHeaders      a reference to the vector to be built.
  */
-void ASResource::buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders)
+void TRResource::buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders)
 {
 	preDefinitionHeaders->push_back(&AS_CLASS);
 	preDefinitionHeaders->push_back(&AS_STRUCT);
@@ -409,11 +409,11 @@ void ASResource::buildPreDefinitionHeaders(vector<const string*>* preDefinitionH
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                             ASBase Functions
+ *                             TRBase Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // check if a specific line position contains a keyword.
-bool ASBase::findKeyword(const string &line, int i, const string &keyword) const
+bool TRBase::findKeyword(const string &line, int i, const string &keyword) const
 {
 	assert(isCharPotentialHeader(line, i));
 	// check the word
@@ -437,7 +437,7 @@ bool ASBase::findKeyword(const string &line, int i, const string &keyword) const
 
 // get the current word on a line
 // index must point to the beginning of the word
-string ASBase::getCurrentWord(const string &line, size_t index) const
+string TRBase::getCurrentWord(const string &line, size_t index) const
 {
 	assert(isCharPotentialHeader(line, index));
 	size_t lineLength = line.length();
@@ -450,4 +450,4 @@ string ASBase::getCurrentWord(const string &line, size_t index) const
 	return line.substr(index, i - index);
 }
 
-}   // end namespace astyle
+}   // end namespace TaaRRule

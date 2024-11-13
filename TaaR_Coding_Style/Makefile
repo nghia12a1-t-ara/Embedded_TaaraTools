@@ -2,64 +2,49 @@
 ######### TaaR_Coding_Style ###############
 ######### Author : Nghia Taarabt ##########
 ######### Created Date : 06/08/2023 #######
+PROJECT = .
 
 # list of source files for astyle
-SRC = astyle_main.cpp \
-      ASBeautifier.cpp \
-      ASFormatter.cpp \
-      ASEnhancer.cpp \
-      ASLocalizer.cpp \
-      ASResource.cpp
+SRC_FILES = main.cpp \
+			ASBeautifier.cpp \
+			TRFormatter.cpp \
+			ASEnhancer.cpp \
+			TRLanguage.cpp \
+			TRResource.cpp
 
 # source directories
-vpath %.cpp ./src
-vpath %.h   ./src
-
-# set prefix if not defined on the command line
-ifndef prefix
-    prefix=/usr
-endif
+vpath %.cpp $(PROJECT)/src
+vpath %.h   $(PROJECT)/src
 
 # define macros
 # CXX defaults to g++
 CXX = g++
-bindir = bin
-objdir = obj
-ipath=$(prefix)/bin
-CBASEFLAGS = -Wall -Wextra -fno-rtti -fno-exceptions -std=c++17
-INSTALL=install -o $(USER) -g $(USER)
+BIN_DIR = bin
+OBJ_DIRS = obj
+INC_DIRS = $(PROJECT)/src
+CXXFLAGS = 	-Wall -Wextra -fno-rtti -fno-exceptions -std=c++17 \
+			-I$(INC_DIRS) \
+			-D_WIN32 -DWIN32_LEAN_AND_MEAN -DNOMINMAX -UUNICODE \
+			-DNDEBUG
 
-# define compile options for each build
-ifdef CFLAGS
-    CFLAGSr   = -DNDEBUG $(CBASEFLAGS) $(CFLAGS)
-else
-    CFLAGSr   = -DNDEBUG -O3 $(CBASEFLAGS)
-endif
+# object files are built from the source list $(SRC_FILES)
+OBJ_FILES = $(patsubst %.cpp,$(OBJ_DIRS)/%.o,$(SRC_FILES))
 
-# object files are built from the source list $(SRC)
-OBJ   = $(patsubst %.cpp,$(objdir)/%.o,$(SRC))
+.PHONY: main clean $(OBJ_DIRS)/%.o
 
 # define object file rule (with the suffix) for each build
-$(objdir)/%.o:  %.cpp  astyle.h  astyle_main.h
-	@ mkdir -p $(objdir)
-	$(CXX) $(CFLAGSr) -c $< -o $@
+$(OBJ_DIRS)/%.o:  %.cpp
+	@ mkdir -p $(OBJ_DIRS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-##################################################
-# define build dependencies for each command
-
-# Target to build the release version of astyle
-release:  astyle
-astyle:  $(OBJ)
-	@ mkdir -p $(bindir)
-	$(CXX) $(LDFLAGSr) -o $(bindir)/$@ $^
-	@ echo
+# Target to build the release version
+main: $(OBJ_FILES)
+	@ mkdir -p $(BIN_DIR)
+	$(CXX) -o $(BIN_DIR)/$@ $^
+	@ echo "Build Successfully!... >>> $(PROJECT)/$(BIN_DIR)/main.exe"
 
 clean:
-	rm -f $(objdir)/*.o $(bindir)/astyle*
+	rm -f $(OBJ_DIRS)/*.o $(BIN_DIR)/*.exe
 
-install:
-	$(INSTALL) -m 755 -d $(ipath)
-	@$(INSTALL) -m 755 $(bindir)/astyle  $(ipath)
-
-uninstall:
-	rm -f $(ipath)/astyle
+print-%:
+	@echo $($(subst print-,,$@))

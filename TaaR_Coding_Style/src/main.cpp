@@ -1,70 +1,36 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: astyle_main.cpp
+ *	@File	: main.cpp
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#include "astyle_main.h"
+#include "main.h"
 #include <algorithm>
 #include <cstdlib>
 #include <errno.h>
 #include <fstream>
 #include <sstream>
-
-// includes for recursive getFileNames() function
-#ifdef _WIN32
-#undef UNICODE		// use ASCII windows functions
 #include <windows.h>
-#else
-#include <dirent.h>
-#include <iconv.h>
-#include <sys/stat.h>
-#ifdef __VMS
-#include <unixlib.h>
-#include <rms.h>
-#include <ssdef.h>
-#include <stsdef.h>
-#include <lib$routines.h>
-#include <starlet.h>
-#endif /* __VMS */
-#endif
 
-#ifdef __DMC__
-#include <locale.h>
-#endif
+namespace TaaRRule {
 
-// turn off MinGW automatic file globbing
-// this CANNOT be in the astyle namespace
-#ifndef ASTYLE_LIB
-int _CRT_glob = 0;
-#endif
-
-namespace astyle {
-
-#ifdef _WIN32
 char g_fileSeparator = '\\';
 bool g_isCaseSensitive = false;
-#else
-char g_fileSeparator = '/';
-bool g_isCaseSensitive = true;
-#endif
 
 // console build variables
-#ifndef ASTYLE_LIB
 ostream* _err = &cerr;           // direct error messages to cerr
 ASConsole* g_console = NULL;     // class to encapsulate console variables
-#endif
 
 //-----------------------------------------------------------------------------
-// ASStreamIterator class
+// TRStreamIterator class
 // typename will be istringstream for GUI and istream otherwise
 //-----------------------------------------------------------------------------
 
 template<typename T>
-ASStreamIterator<T>::ASStreamIterator(T* in)
+TRStreamIterator<T>::TRStreamIterator(T* in)
 {
 	inStream = in;
 	buffer.reserve(200);
@@ -78,7 +44,7 @@ ASStreamIterator<T>::ASStreamIterator(T* in)
 }
 
 template<typename T>
-ASStreamIterator<T>::~ASStreamIterator()
+TRStreamIterator<T>::~TRStreamIterator()
 {
 }
 
@@ -89,7 +55,7 @@ ASStreamIterator<T>::~ASStreamIterator()
  * @return        string containing the next input line minus any end of line characters
  */
 template<typename T>
-string ASStreamIterator<T>::nextLine(bool emptyLineWasDeleted)
+string TRStreamIterator<T>::nextLine(bool emptyLineWasDeleted)
 {
 	// verify that the current position is correct
 	assert (peekStart == 0);
@@ -172,9 +138,9 @@ string ASStreamIterator<T>::nextLine(bool emptyLineWasDeleted)
 // save the current position and get the next line
 // this can be called for multiple reads
 // when finished peeking you MUST call peekReset()
-// call this function from ASFormatter ONLY
+// call this function from TRFormatter ONLY
 template<typename T>
-string ASStreamIterator<T>::peekNextLine()
+string TRStreamIterator<T>::peekNextLine()
 {
 	assert (hasMoreLines());
 	string nextLine_;
@@ -210,7 +176,7 @@ string ASStreamIterator<T>::peekNextLine()
 
 // reset current position and EOF for peekNextLine()
 template<typename T>
-void ASStreamIterator<T>::peekReset()
+void TRStreamIterator<T>::peekReset()
 {
 	assert(peekStart != 0);
 	inStream->clear();
@@ -220,7 +186,7 @@ void ASStreamIterator<T>::peekReset()
 
 // save the last input line after input has reached EOF
 template<typename T>
-void ASStreamIterator<T>::saveLastInputLine()
+void TRStreamIterator<T>::saveLastInputLine()
 {
 	assert(inStream->eof());
 	prevBuffer = buffer;
@@ -228,7 +194,7 @@ void ASStreamIterator<T>::saveLastInputLine()
 
 // check for a change in line ends
 template<typename T>
-bool ASStreamIterator<T>::getLineEndChange(int lineEndFormat) const
+bool TRStreamIterator<T>::getLineEndChange(int lineEndFormat) const
 {
 	assert(lineEndFormat == LINEEND_DEFAULT
 	       || lineEndFormat == LINEEND_WINDOWS
@@ -258,8 +224,6 @@ bool ASStreamIterator<T>::getLineEndChange(int lineEndFormat) const
 // ASConsole class
 // main function will be included only in the console build
 //-----------------------------------------------------------------------------
-
-#ifndef ASTYLE_LIB
 
 // rewrite a stringstream converting the line ends
 void ASConsole::convertLineEnds(ostringstream &out, int lineEnd)
@@ -412,7 +376,7 @@ void ASConsole::formatCinToCout()
 		inStream->get(ch);
 		outStream.put(ch);
 	}
-	ASStreamIterator<stringstream> streamIterator(&outStream);
+	TRStreamIterator<stringstream> streamIterator(&outStream);
 	// Windows pipe or redirection always outputs Windows line-ends.
 	// Linux pipe or redirection will output any line end.
 	LineEndFormat lineEndFormat = formatter.getLineEndFormat();
@@ -465,7 +429,7 @@ void ASConsole::formatFile(const string &fileName_)
 	LineEndFormat lineEndFormat = formatter.getLineEndFormat();
 	initializeOutputEOL(lineEndFormat);
 	// do this AFTER setting the file mode
-	ASStreamIterator<stringstream> streamIterator(&in);
+	TRStreamIterator<stringstream> streamIterator(&in);
 	formatter.init(&streamIterator);
 
 	// format the file
@@ -750,8 +714,6 @@ void ASConsole::setOutputEOL(LineEndFormat lineEndFormat, const char* currentEOL
 	}
 }
 
-#ifdef _WIN32  // Windows specific
-
 /**
  * WINDOWS function to display the last system error.
  */
@@ -777,9 +739,9 @@ void ASConsole::displayLastError()
 /**
  * WINDOWS function to get the current directory.
  * NOTE: getenv("CD") does not work for Windows Vista.
- *        The Windows function GetCurrentDirectory is used instead.
+ *        	The Windows function GetCurrentDirectory is used instead.
  *
- * @return              The path of the current directory
+ * @return	The path of the current directory
  */
 string ASConsole::getCurrentDirectory(const string &fileName_) const
 {
@@ -878,7 +840,7 @@ void ASConsole::getFileNames(const string &directory, const string &wildcard)
  */
 string ASConsole::getNumberFormat(int num, size_t lcid) const
 {
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__BORLANDC__) || defined(__GNUC__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__GNUC__)
 	// Compilers that don't support C++ locales should still support this assert.
 	// The C locale should be set but not the C++.
 	// This function is not necessary if the C++ locale is set.
@@ -916,188 +878,6 @@ string ASConsole::getNumberFormat(int num, size_t lcid) const
 		formattedNum = "0";
 	return formattedNum;
 }
-
-#else  // not _WIN32
-
-/**
- * LINUX function to get the current directory.
- * This is done if the fileName does not contain a path.
- * It is probably from an editor sending a single file.
- *
- * @param fileName_     The filename is used only for  the error message.
- * @return              The path of the current directory
- */
-string ASConsole::getCurrentDirectory(const string &fileName_) const
-{
-	char* currdir = getenv("PWD");
-	if (currdir == NULL)
-		error("Cannot find file", fileName_.c_str());
-	return string(currdir);
-}
-
-/**
- * LINUX function to resolve wildcards and recurse into sub directories.
- * The fileName vector is filled with the path and names of files to process.
- *
- * @param directory     The path of the directory to be processed.
- * @param wildcard      The wildcard to be processed (e.g. *.cpp).
- */
-void ASConsole::getFileNames(const string &directory, const string &wildcard)
-{
-	struct dirent* entry;           // entry from readdir()
-	struct stat statbuf;            // entry from stat()
-	vector<string> subDirectory;    // sub directories of this directory
-
-	// errno is defined in <errno.h> and is set for errors in opendir, readdir, or stat
-	errno = 0;
-
-	DIR* dp = opendir(directory.c_str());
-	if (dp == NULL)
-		error(_("Cannot open directory"), directory.c_str());
-
-	// save the first fileName entry for this recursion
-	const unsigned firstEntry = fileName.size();
-
-	// save files and sub directories
-	while ((entry = readdir(dp)) != NULL)
-	{
-		// get file status
-		string entryFilepath = directory + g_fileSeparator + entry->d_name;
-		if (stat(entryFilepath.c_str(), &statbuf) != 0)
-		{
-			if (errno == EOVERFLOW)         // file over 2 GB is OK
-			{
-				errno = 0;
-				continue;
-			}
-			perror("errno message");
-			error("Error getting file status in directory", directory.c_str());
-		}
-		// skip hidden or read only
-		if (entry->d_name[0] == '.' || !(statbuf.st_mode & S_IWUSR))
-			continue;
-		// if a sub directory and recursive, save sub directory
-		if (S_ISDIR(statbuf.st_mode) && isRecursive)
-		{
-			if (isPathExclued(entryFilepath))
-				printMsg(_("Exclude  %s\n"), entryFilepath.substr(mainDirectoryLength));
-			else
-				subDirectory.push_back(entryFilepath);
-			continue;
-		}
-
-		// if a file, save file name
-		if (S_ISREG(statbuf.st_mode))
-		{
-			// check exclude before wildcmp to avoid "unmatched exclude" error
-			bool isExcluded = isPathExclued(entryFilepath);
-			// save file name if wildcard match
-			if (wildcmp(wildcard.c_str(), entry->d_name))
-			{
-				if (isExcluded)
-					printMsg(_("Exclude  %s\n"), entryFilepath.substr(mainDirectoryLength));
-				else
-					fileName.push_back(entryFilepath);
-			}
-		}
-	}
-
-	if (closedir(dp) != 0)
-	{
-		perror("errno message");
-		error("Error reading directory", directory.c_str());
-	}
-
-	// sort the current entries for fileName
-	if (firstEntry < fileName.size())
-		sort(&fileName[firstEntry], &fileName[fileName.size()]);
-
-	// recurse into sub directories
-	// if not doing recursive, subDirectory is empty
-	if (subDirectory.size() > 1)
-		sort(subDirectory.begin(), subDirectory.end());
-	for (unsigned i = 0; i < subDirectory.size(); i++)
-	{
-		getFileNames(subDirectory[i], wildcard);
-	}
-
-	return;
-}
-
-/**
- * LINUX function to get locale information and call getNumberFormat.
- * This formats positive integers only, no float.
- *
- * @param num		The number to be formatted.
- * @param			For compatibility with the Windows function.
- * @return			The formatted number.
- */
-string ASConsole::getNumberFormat(int num, size_t) const
-{
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__BORLANDC__) || defined(__GNUC__)
-	// Compilers that don't support C++ locales should still support this assert.
-	// The C locale should be set but not the C++.
-	// This function is not necessary if the C++ locale is set.
-	// The locale().name() return value is not portable to all compilers.
-	assert(locale().name() == "C");
-#endif
-
-	// get the locale info
-	struct lconv* lc;
-	lc = localeconv();
-
-	// format the number
-	return getNumberFormat(num, lc->grouping, lc->thousands_sep);
-}
-
-/**
- * LINUX function to format a number according to the current locale.
- * This formats positive integers only, no float.
- *
- * @param num			The number to be formatted.
- * @param groupingArg   The grouping string from the locale.
- * @param  separator	The thousands group separator from the locale.
- * @return				The formatted number.
- */
-string ASConsole::getNumberFormat(int num, const char* groupingArg, const char* separator) const
-{
-	// convert num to a string
-	stringstream alphaNum;
-	alphaNum << num;
-	string number = alphaNum.str();
-	// format the number from right to left
-	string formattedNum;
-	size_t ig = 0;	// grouping index
-	int grouping = groupingArg[ig];
-	int i = number.length();
-	// check for no grouping
-	if (grouping == 0)
-		grouping = number.length();
-	while (i > 0)
-	{
-		// extract a group of numbers
-		string group;
-		if (i < grouping)
-			group = number;
-		else
-			group = number.substr(i - grouping);
-		// update formatted number
-		formattedNum.insert(0, group);
-		i -= grouping;
-		if (i < 0)
-			i = 0;
-		if (i > 0)
-			formattedNum.insert(0, separator);
-		number.erase(i);
-		// update grouping
-		if (groupingArg[ig] != '\0'
-		        && groupingArg[ig + 1] != '\0')
-			grouping = groupingArg[++ig];
-	}
-	return formattedNum;
-}
-
-#endif  // _WIN32
 
 // get individual file names from the command-line file path
 void ASConsole::getFilePaths(string &filePath)
@@ -1142,9 +922,6 @@ void ASConsole::getFilePaths(string &filePath)
 	if (isRecursive && !hasWildcard)
 	{
 		fprintf(stderr, "%s\n", _("Recursive option with no wildcard"));
-#ifndef _WIN32
-		fprintf(stderr, "%s\n", _("Did you intend quote the filename"));
-#endif
 		error();
 	}
 
@@ -1286,8 +1063,8 @@ void ASConsole::printHelp() const
 	(*_err) << "                     Maintained by: Nghia Taarabt\n";
 	(*_err) << "                     Original Author: Tal Davidson\n";
 	(*_err) << endl;
-	(*_err) << "Usage  :  astyle [options] Source1.cpp Source2.cpp  [...]\n";
-	(*_err) << "          astyle [options] < Original > Beautified\n";
+	(*_err) << "Usage  :  TaaRRule [options] Source1.cpp Source2.cpp  [...]\n";
+	(*_err) << "          TaaRRule [options] < Original > Beautified\n";
 	(*_err) << endl;
 	(*_err) << "When indenting a specific file, the resulting indented file RETAINS the\n";
 	(*_err) << "original file-name. The original pre-indented file is renamed, with a\n";
@@ -1296,7 +1073,7 @@ void ASConsole::printHelp() const
 	(*_err) << "Wildcards (* and ?) may be used in the filename.\n";
 	(*_err) << "A \'recursive\' option can process directories recursively.\n";
 	(*_err) << endl;
-	(*_err) << "By default, astyle is set up to indent C/C++ files, with four\n";
+	(*_err) << "By default, TaaRRule is set up to indent C/C++ files, with four\n";
 	(*_err) << "spaces per indent, a maximal indentation of 40 spaces inside continuous\n";
 	(*_err) << "statements, a minimum indentation of eight spaces inside conditional\n";
 	(*_err) << "statements, and NO formatting options.\n";
@@ -1708,7 +1485,6 @@ void ASConsole::processOptions(vector<string> &argvOptions)
 		{
 			useAscii = true;
 			setlocale(LC_ALL, "C");		// use English decimal indicator
-			localizer.setLanguageFromName("en");
 		}
 		else if ( isOption(arg, "--options=none") )
 		{
@@ -1792,7 +1568,7 @@ void ASConsole::processOptions(vector<string> &argvOptions)
 	if (!ok)
 	{
 		(*_err) << options.getOptionErrors() << endl;
-		(*_err) << _("For help on options type 'astyle -h'") << endl;
+		(*_err) << _("For help on options type 'TaaRRule -h'") << endl;
 		error();
 	}
 
@@ -1802,7 +1578,7 @@ void ASConsole::processOptions(vector<string> &argvOptions)
 	if (!ok)
 	{
 		(*_err) << options.getOptionErrors() << endl;
-		(*_err) << _("For help on options type 'astyle -h'") << endl;
+		(*_err) << _("For help on options type 'TaaRRule -h'") << endl;
 		error();
 	}
 }
@@ -1848,52 +1624,6 @@ void ASConsole::renameFile(const char* oldFileName, const char* newFileName, con
 // remove beginning file separator if requested and NOT a complete file path
 void ASConsole::standardizePath(string &path, bool removeBeginningSeparator /*false*/) const
 {
-#ifdef __VMS
-	struct FAB fab;
-	struct NAML naml;
-	char less[NAML$C_MAXRSS];
-	char sess[NAM$C_MAXRSS];
-	int r0_status;
-
-	// If we are on a VMS system, translate VMS style filenames to unix
-	// style.
-	fab = cc$rms_fab;
-	fab.fab$l_fna = (char*) - 1;
-	fab.fab$b_fns = 0;
-	fab.fab$l_naml = &naml;
-	naml = cc$rms_naml;
-	strcpy (sess, path.c_str());
-	naml.naml$l_long_filename = (char*)sess;
-	naml.naml$l_long_filename_size = path.length();
-	naml.naml$l_long_expand = less;
-	naml.naml$l_long_expand_alloc = sizeof (less);
-	naml.naml$l_esa = sess;
-	naml.naml$b_ess = sizeof (sess);
-	naml.naml$v_no_short_upcase = 1;
-	r0_status = sys$parse (&fab);
-	if (r0_status == RMS$_SYN)
-	{
-		error("File syntax error", path.c_str());
-	}
-	else
-	{
-		if (!$VMS_STATUS_SUCCESS(r0_status))
-		{
-			(void)lib$signal (r0_status);
-		}
-	}
-	less[naml.naml$l_long_expand_size - naml.naml$b_ver] = '\0';
-	sess[naml.naml$b_esl - naml.naml$b_ver] = '\0';
-	if (naml.naml$l_long_expand_size > naml.naml$b_esl)
-	{
-		path = decc$translate_vms (less);
-	}
-	else
-	{
-		path = decc$translate_vms (sess);
-	}
-#endif /* __VMS */
-
 	// make sure separators are correct type (Windows or Linux)
 	for (size_t i = 0; i < path.length(); i++)
 	{
@@ -1902,13 +1632,10 @@ void ASConsole::standardizePath(string &path, bool removeBeginningSeparator /*fa
 			break;
 		path[i] = g_fileSeparator;
 	}
-//  The following was removed in release 2.02 - jimp
-//	// remove separator from the end
-//	if (path[path.length()-1] == g_fileSeparator)
-//		path.erase(path.length()-1, 1);
-	// remove beginning separator if requested
 	if (removeBeginningSeparator && (path[0] == g_fileSeparator))
+	{
 		path.erase(0, 1);
+	}
 }
 
 void ASConsole::printMsg(const char* msg, const string &data) const
@@ -1938,10 +1665,10 @@ void ASConsole::printVerboseHeader() const
 	lt = time(NULL);
 	ptr = localtime(&lt);
 	strftime(str, 20, "%x", ptr);
-	// print the header
-	// print options file
 	if (!optionsFileName.empty())
+	{
 		printf(_("Using default options file %s\n"), optionsFileName.c_str());
+	}
 }
 
 void ASConsole::printVerboseStats(clock_t startTime) const
@@ -2427,285 +2154,6 @@ void ASConsole::writeFile(const string &fileName_, FileEncoding encoding, ostrin
 		}
 	}
 }
-
-//-----------------------------------------------------------------------------
-// ASLibrary class
-// used by shared object (DLL) calls
-//-----------------------------------------------------------------------------
-
-#else	// ASTYLE_LIB
-
-utf16_t* ASLibrary::formatUtf16(const utf16_t* pSourceIn,		// the source to be formatted
-                                const utf16_t* pOptions,		// AStyle options
-                                fpError fpErrorHandler,			// error handler function
-                                fpAlloc fpMemoryAlloc) const	// memory allocation function)
-{
-	const char* utf8In = convertUtf16ToUtf8(pSourceIn);
-	if (utf8In == NULL)
-	{
-		fpErrorHandler(121, "Cannot convert input utf-16 to utf-8.");
-		return NULL;
-	}
-	const char* utf8Options = convertUtf16ToUtf8(pOptions);
-	if (utf8Options == NULL)
-	{
-		delete [] utf8In;
-		fpErrorHandler(122, "Cannot convert options utf-16 to utf-8.");
-		return NULL;
-	}
-	// call the Artistic Style formatting function
-	// cannot use the callers memory allocation here
-	char* utf8Out = ::AStyleMain(utf8In,
-	                             utf8Options,
-	                             fpErrorHandler,
-	                             ASLibrary::tempMemoryAllocation);
-	// finished with these
-	delete [] utf8In;
-	delete [] utf8Options;
-	utf8In = NULL;
-	utf8Options = NULL;
-	// AStyle error has already been sent
-	if (utf8Out == NULL)
-		return NULL;
-	// convert text to wide char and return it
-	utf16_t* utf16Out = convertUtf8ToUtf16(utf8Out, fpMemoryAlloc);
-	delete [] utf8Out;
-	utf8Out = NULL;
-	if (utf16Out == NULL)
-	{
-		fpErrorHandler(123, "Cannot convert output utf-8 to utf-16.");
-		return NULL;
-	}
-	return utf16Out;
-}
-
-bool ASLibrary::getBigEndian() const
-{
-	short int word = 0x0001;
-	char* byte = (char*) &word;
-	return (byte[0] ? false : true);
-}
-
-// Swap the two low order bytes of a 16 bit integer value.
-int ASLibrary::swap16bit(int value) const
-{
-	return ( ((value & 0xff) << 8) | ((value & 0xff00) >> 8) );
-}
-
-// STATIC method to allocate temporary memory for AStyle formatting.
-// The data will be converted before being returned to the calling program.
-char* STDCALL ASLibrary::tempMemoryAllocation(unsigned long memoryNeeded)
-{
-	char* buffer = new(nothrow) char [memoryNeeded];
-	return buffer;
-}
-
-// Adapted from SciTE UniConversion.cxx.
-// Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
-// Modified for Artistic Style by Jim Pattee.
-//
-// Compute the length of an output utf-8 file given a utf-16 file.
-// Input tlen is the size in BYTES (not wchar_t).
-size_t ASLibrary::Utf8LengthFromUtf16(const char* data, size_t tlen, bool isBigEndian) const
-{
-	enum { SURROGATE_LEAD_FIRST = 0xD800 };
-	enum { SURROGATE_TRAIL_LAST = 0xDFFF };
-
-	size_t len = 0;
-	size_t wcharLen = tlen / 2;
-	const short* uptr = reinterpret_cast<const short*>(data);
-	for (size_t i = 0; i < wcharLen && uptr[i];)
-	{
-		size_t uch = isBigEndian ? swap16bit(uptr[i]) : uptr[i];
-		if (uch < 0x80)
-		{
-			len++;
-		}
-		else if (uch < 0x800)
-		{
-			len += 2;
-		}
-		else if ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_TRAIL_LAST))
-		{
-			len += 4;
-			i++;
-		}
-		else
-		{
-			len += 3;
-		}
-		i++;
-	}
-	return len;
-}
-
-// Adapted from SciTE UniConversion.cxx.
-// Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
-// Modified for Artistic Style by Jim Pattee.
-//
-// Compute the length of an output utf-16 file given a utf-8 file.
-// Return value is the size in BYTES (not wchar_t).
-size_t ASLibrary::Utf16LengthFromUtf8(const char* data, size_t len) const
-{
-	size_t ulen = 0;
-	size_t charLen;
-	for (size_t i = 0; i < len;)
-	{
-		unsigned char ch = static_cast<unsigned char>(data[i]);
-		if (ch < 0x80)
-			charLen = 1;
-		else if (ch < 0x80 + 0x40 + 0x20)
-			charLen = 2;
-		else if (ch < 0x80 + 0x40 + 0x20 + 0x10)
-			charLen = 3;
-		else
-		{
-			charLen = 4;
-			ulen++;
-		}
-		i += charLen;
-		ulen++;
-	}
-	// return value is the length in bytes (not wchar_t)
-	return ulen * 2;
-}
-
-#ifdef _WIN32
-
-/**
- * WINDOWS function to convert utf-8 strings to wchar_t (utf16) strings.
- * Windows wchar_t is utf-16.
- * Memory is allocated by the calling program memory allocation function.
- * The calling function must check for errors.
- */
-wchar_t* ASLibrary::convertUtf8ToUtf16(const char* utf8In, fpAlloc fpMemoryAlloc) const
-{
-	int wideLen = MultiByteToWideChar(CP_UTF8, 0, utf8In, -1, 0, 0);
-	if (wideLen == 0)
-		return NULL;
-	wchar_t* wide = reinterpret_cast<wchar_t*>(fpMemoryAlloc(wideLen * 2));
-	if (wide == NULL)
-		return NULL;
-	MultiByteToWideChar(CP_UTF8, 0, utf8In, -1, wide, wideLen);
-	return wide;
-}
-
-/**
- * WINDOWS function to convert wchar_t (utf16) strings to utf-8 strings.
- * Windows wchar_t is utf-16.
- * The calling function must check for errors and delete the
- * allocated memory.
- */
-char* ASLibrary::convertUtf16ToUtf8(const wchar_t* wcharIn) const
-{
-	int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wcharIn, -1, 0, 0, 0, 0);
-	if (utf8Len == 0)
-		return NULL;
-	char* utf8 = new(nothrow) char[utf8Len];
-	if (utf8 == NULL)
-		return NULL;
-	WideCharToMultiByte(CP_UTF8, 0, wcharIn, -1, utf8, utf8Len, 0, 0);
-	return utf8;
-}
-
-#else	// not _WIN32
-
-/**
- * LINUX function to convert utf-8 strings to utf16.
- * Linux wchar_t is utf-32.
- * Memory is allocated by the calling program memory allocation function.
- * The calling function must check for errors.
- */
-utf16_t* ASLibrary::convertUtf8ToUtf16(const char* utf8In, fpAlloc fpMemoryAlloc) const
-{
-	if (utf8In == NULL)
-		return NULL;
-	iconv_t iconvh = iconv_open("UTF-16", "UTF-8//TRANSLIT");
-	if (iconvh == reinterpret_cast<iconv_t>(-1))
-		return NULL;
-	size_t utf16Len = Utf16LengthFromUtf8(utf8In, strlen(utf8In) + 1) + sizeof(utf16_t);
-	utf16_t* utf16Out = reinterpret_cast<utf16_t*>(fpMemoryAlloc(utf16Len));
-	if (utf16Out == NULL)
-		return NULL;
-	char* utf8Conv = const_cast<char*>(utf8In);
-	size_t inLeft = strlen(utf8In) + 1;		// converts the ending NULL
-	char* utf16Conv = reinterpret_cast<char*>(utf16Out);
-	size_t outLeft = utf16Len;
-	size_t iconvval = iconv(iconvh, &utf8Conv, &inLeft, &utf16Conv, &outLeft);
-	///////////////////////////////////////////////////////
-	bool showStats = false;
-	if (showStats && (inLeft != 0 || outLeft != 0))
-	{
-		cout << "-------- 8 to 16 --------" << endl;
-		cout << utf16Len << " utf16len allocated" << endl;
-		cout << inLeft << " inLeft  " << outLeft << " outLeft" << endl;
-		cout << utf16len(utf16Out) << " utf16len out" << endl;
-		cout << "-------------------------" << endl;
-	}
-	///////////////////////////////////////////////////////
-	if (iconvval == static_cast<size_t>(-1))
-		return NULL;
-	iconv_close(iconvh);
-	return utf16Out;
-}
-
-/**
- * LINUX function to convert utf16 strings to utf-8.
- * Linux wchar_t is utf-32.
- * The calling function must check for errors and delete the
- * allocated memory.
- */
-char* ASLibrary::convertUtf16ToUtf8(const utf16_t* utf16In) const
-{
-	if (utf16In == NULL)
-		return NULL;
-	iconv_t iconvh = iconv_open("UTF-8", "UTF-16//TRANSLIT");
-	if (iconvh == reinterpret_cast<iconv_t>(-1))
-		return NULL;
-	// length must be in chars
-	size_t utf8Len = Utf8LengthFromUtf16(reinterpret_cast<char*>(const_cast<utf16_t*>(utf16In)),
-	                                     (utf16len(utf16In) * sizeof(utf16_t)), getBigEndian()) + 1;
-	char* utf8Out = new(nothrow) char[utf8Len];
-	if (utf8Out == NULL)
-		return NULL;
-	char* utf16Conv = reinterpret_cast<char*>(const_cast<utf16_t*>(utf16In));
-	// length must be in chars
-	size_t inLeft = (utf16len(utf16In) + 1) * sizeof(utf16_t);	// converts the ending NULL
-	char* utf8Conv = utf8Out;
-	size_t outLeft = utf8Len;
-	size_t iconvval = iconv(iconvh, &utf16Conv, &inLeft, &utf8Conv, &outLeft);
-	///////////////////////////////////////////////////////
-	bool showStats = false;
-	if (showStats && (inLeft != 0 || outLeft != 0))
-	{
-		cout << "-------- 16 to 8 --------" << endl;
-		cout << utf16len(utf16In) << " text16In" << endl;
-		cout << utf8Len << " utf8len allocated" << endl;
-		cout << inLeft << " inLeft  " << outLeft << " outLeft" << endl;
-		cout << strlen(utf8Out) << " utf8len out" << endl;
-		cout << "-------------------------" << endl;
-	}
-	///////////////////////////////////////////////////////
-	if (iconvval == static_cast<size_t>(-1))
-	{
-		perror("iconv error");
-		return NULL;
-	}
-	iconv_close(iconvh);
-	return utf8Out;
-}
-
-// LINUX function to return the length of a utf-16 C string.
-size_t ASLibrary::utf16len(const utf16_t* utf16In) const
-{
-	size_t length = 0;
-	while (*utf16In++ != '\0')
-		length++;
-	return length;
-}
-
-#endif	// _WIN32
-#endif	// ASTYLE_LIB
 
 //-----------------------------------------------------------------------------
 // ASOptions class
@@ -3203,39 +2651,10 @@ void ASOptions::parseOption(const string &arg, const string &errorInfo)
 	{
 		formatter.setObjCColonPaddingMode(COLON_PAD_BEFORE);
 	}
-	// depreciated options ////////////////////////////////////////////////////////////////////////////////////////////
 	else if ( isOption(arg, "indent-preprocessor") )	// depreciated release 2.04
 	{
 		formatter.setPreprocDefineIndent(true);
 	}
-//  NOTE: Removed in release 2.04.
-//	else if ( isOption(arg, "b", "brackets=break") )
-//	{
-//		formatter.setBracketFormatMode(BREAK_MODE);
-//	}
-//	else if ( isOption(arg, "a", "brackets=attach") )
-//	{
-//		formatter.setBracketFormatMode(ATTACH_MODE);
-//	}
-//	else if ( isOption(arg, "l", "brackets=linux") )
-//	{
-//		formatter.setBracketFormatMode(LINUX_MODE);
-//	}
-//	else if ( isOption(arg, "u", "brackets=stroustrup") )
-//	{
-//		formatter.setBracketFormatMode(STROUSTRUP_MODE);
-//	}
-//	else if ( isOption(arg, "g", "brackets=run-in") )
-//	{
-//		formatter.setBracketFormatMode(RUN_IN_MODE);
-//	}
-	// end depreciated options ////////////////////////////////////////////////////////////////////////////////////////
-#ifdef ASTYLE_LIB
-	// End of options used by GUI /////////////////////////////////////////////////////////////////////////////////////
-	else
-		isOptionError(arg, errorInfo);
-#else
-	// Options used by only console ///////////////////////////////////////////////////////////////////////////////////
 	else if ( isOption(arg, "n", "suffix=none") )
 	{
 		g_console->setNoBackup(true);
@@ -3315,7 +2734,6 @@ void ASOptions::parseOption(const string &arg, const string &errorInfo)
 	}
 	else
 		isOptionError(arg, errorInfo);
-#endif
 }	// End of parseOption function
 
 void ASOptions::importOptions(istream &in, vector<string> &optionsVector)
@@ -3403,152 +2821,19 @@ bool ASOptions::isParamOption(const string &arg, const char* option1, const char
 
 //----------------------------------------------------------------------------
 
-}   // end of astyle namespace
+}   // end of TaaRRule namespace
 
 //----------------------------------------------------------------------------
 
-using namespace astyle;
-//----------------------------------------------------------------------------
-// Entry point for AStyleMainUtf16
-//----------------------------------------------------------------------------
-
-#ifdef ASTYLE_LIB
-
-extern "C" EXPORT utf16_t* STDCALL AStyleMainUtf16(const utf16_t* pSourceIn,	// the source to be formatted
-                                                   const utf16_t* pOptions,		// AStyle options
-                                                   fpError fpErrorHandler,		// error handler function
-                                                   fpAlloc fpMemoryAlloc)		// memory allocation function
-{
-	if (fpErrorHandler == NULL)         // cannot display a message if no error handler
-		return NULL;
-
-	if (pSourceIn == NULL)
-	{
-		fpErrorHandler(101, "No pointer to source input.");
-		return NULL;
-	}
-	if (pOptions == NULL)
-	{
-		fpErrorHandler(102, "No pointer to AStyle options.");
-		return NULL;
-	}
-	if (fpMemoryAlloc == NULL)
-	{
-		fpErrorHandler(103, "No pointer to memory allocation function.");
-		return NULL;
-	}
-#ifndef _WIN32
-	// check size of utf16_t on Linux
-	int sizeCheck = 2;
-	if (sizeof(utf16_t) != sizeCheck)
-	{
-		fpErrorHandler(104, "Unsigned short is not the correct size.");
-		return NULL;
-	}
-#endif
-
-	ASLibrary library;
-	utf16_t* utf16Out = library.formatUtf16(pSourceIn, pOptions, fpErrorHandler, fpMemoryAlloc);
-	return utf16Out;
-}
+using namespace TaaRRule;
 
 //----------------------------------------------------------------------------
-// ASTYLE_LIB functions for calling AStyleMain
+// main function functions for Console build
 //----------------------------------------------------------------------------
-/*
- * This is apparently no longer required.
- * IMPORTANT VC DLL linker for WIN32 must have the parameter  /EXPORT:AStyleMain=_AStyleMain@16
- * No /EXPORT is required for x64
- */
-extern "C" EXPORT char* STDCALL AStyleMain(const char* pSourceIn,		// the source to be formatted
-                                           const char* pOptions,		// AStyle options
-                                           fpError fpErrorHandler,		// error handler function
-                                           fpAlloc fpMemoryAlloc)		// memory allocation function
-{
-	if (fpErrorHandler == NULL)         // cannot display a message if no error handler
-		return NULL;
-
-	if (pSourceIn == NULL)
-	{
-		fpErrorHandler(101, "No pointer to source input.");
-		return NULL;
-	}
-	if (pOptions == NULL)
-	{
-		fpErrorHandler(102, "No pointer to AStyle options.");
-		return NULL;
-	}
-	if (fpMemoryAlloc == NULL)
-	{
-		fpErrorHandler(103, "No pointer to memory allocation function.");
-		return NULL;
-	}
-
-	ASFormatter formatter;
-	ASOptions options(formatter);
-
-	vector<string> optionsVector;
-	istringstream opt(pOptions);
-
-	options.importOptions(opt, optionsVector);
-
-	bool ok = options.parseOptions(optionsVector, "Invalid Artistic Style options:");
-	if (!ok)
-		fpErrorHandler(130, options.getOptionErrors().c_str());
-
-	istringstream in(pSourceIn);
-	ASStreamIterator<istringstream> streamIterator(&in);
-	ostringstream out;
-	formatter.init(&streamIterator);
-
-	while (formatter.hasMoreLines())
-	{
-		out << formatter.nextLine();
-		if (formatter.hasMoreLines())
-			out << streamIterator.getOutputEOL();
-		else
-		{
-			// this can happen if the file if missing a closing bracket and break-blocks is requested
-			if (formatter.getIsLineReady())
-			{
-				out << streamIterator.getOutputEOL();
-				out << formatter.nextLine();
-			}
-		}
-	}
-
-	unsigned long textSizeOut = out.str().length();
-	char* pTextOut = fpMemoryAlloc(textSizeOut + 1);     // call memory allocation function
-	if (pTextOut == NULL)
-	{
-		fpErrorHandler(120, "Allocation failure on output.");
-		return NULL;
-	}
-
-	strcpy(pTextOut, out.str().c_str());
-#ifndef NDEBUG
-	// The checksum is an assert in the console build and ASFormatter.
-	// This error returns the incorrectly formatted file to the editor.
-	// This is done to allow the file to be saved for debugging purposes.
-	if (formatter.getChecksumDiff() != 0)
-		fpErrorHandler(220,
-		               "Checksum error.\n"
-		               "The incorrectly formatted file will be returned for debugging.");
-#endif
-	return pTextOut;
-}
-
-// ASTYLECON_LIB is defined to exclude "main" from the test programs
-#elif !defined(ASTYLECON_LIB)
-
-//----------------------------------------------------------------------------
-// main function functions for ASConsole build
-//----------------------------------------------------------------------------
-
 int main(int argc, char** argv)
 {
 	// create objects
-	ASFormatter formatter;
+	TRFormatter formatter;
 	g_console = new ASConsole(formatter);
 
 	// process command line and options file
@@ -3570,5 +2855,3 @@ int main(int argc, char** argv)
 	delete g_console;
 	return EXIT_SUCCESS;
 }
-
-#endif	// ASTYLE_LIB

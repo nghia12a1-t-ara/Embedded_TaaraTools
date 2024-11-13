@@ -7,9 +7,9 @@
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#include "astyle.h"
+#include "TaaRRule.h"
 
-namespace astyle {
+namespace TaaRRule {
 
 /**
  * ASEnhancer constructor
@@ -28,7 +28,7 @@ ASEnhancer::~ASEnhancer()
 /**
  * initialize the ASEnhancer.
  *
- * init() is called each time an ASFormatter object is initialized.
+ * init() is called each time an TRFormatter object is initialized.
  */
 void ASEnhancer::init(int  _fileType,
                       int  _indentLength,
@@ -39,8 +39,8 @@ void ASEnhancer::init(int  _fileType,
                       bool _preprocessorIndent,
                       bool _emptyLineFill)
 {
-	// formatting variables from ASFormatter and ASBeautifier
-	ASBase::init(_fileType);
+	// formatting variables from TRFormatter and ASBeautifier
+	TRBase::init(_fileType);
 	indentLength = _indentLength;
 	tabLength = _tabLength;
 	useTabs = _useTabs;
@@ -752,4 +752,4 @@ int ASEnhancer::unindentLine(string  &line, int unindent) const
 }
 
 
-}   // end namespace astyle
+}   // end namespace TaaRRule

@@ -7,10 +7,10 @@
  *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#include "astyle.h"
+#include "TaaRRule.h"
 #include <algorithm>
 
-namespace astyle {
+namespace TaaRRule {
 
 // this must be global
 int  g_preprocessorCppExternCBracket;
@@ -81,7 +81,7 @@ ASBeautifier::ASBeautifier()
  *
  * Must explicitly call the base class copy constructor.
  */
-ASBeautifier::ASBeautifier(const ASBeautifier &other) : ASBase(other)
+ASBeautifier::ASBeautifier(const ASBeautifier &other) : TRBase(other)
 {
 	// these don't need to copy the stack
 	waitingBeautifierStack = NULL;
@@ -133,7 +133,7 @@ ASBeautifier::ASBeautifier(const ASBeautifier &other) : ASBase(other)
 	indentableHeaders = other.indentableHeaders;
 
 	// protected variables
-	// variables set by ASFormatter
+	// variables set by TRFormatter
 	// must also be updated in activeBeautifierStack
 	inLineNumber = other.inLineNumber;
 	horstmannIndentInStatement = other.horstmannIndentInStatement;
@@ -258,17 +258,17 @@ ASBeautifier::~ASBeautifier()
  *
  * This init() should be called every time a ABeautifier object is to start
  * beautifying a NEW source file.
- * It is called only when a new ASFormatter object is created.
- * init() recieves a pointer to a ASSourceIterator object that will be
+ * It is called only when a new TRFormatter object is created.
+ * init() recieves a pointer to a TRSourceIterator object that will be
  * used to iterate through the source code.
  *
- * @param iter     a pointer to the ASSourceIterator or ASStreamIterator object.
+ * @param iter     a pointer to the TRSourceIterator or TRStreamIterator object.
  */
-void ASBeautifier::init(ASSourceIterator* iter)
+void ASBeautifier::init(TRSourceIterator* iter)
 {
 	sourceIterator = iter;
 	initVectors();
-	ASBase::init(getFileType());
+	TRBase::init(getFileType());
 
 	initContainer(waitingBeautifierStack, new vector<ASBeautifier*>);
 	initContainer(activeBeautifierStack, new vector<ASBeautifier*>);
@@ -384,13 +384,13 @@ void ASBeautifier::initVectors()
 	preCommandHeaders->clear();
 	indentableHeaders->clear();
 
-	ASResource::buildHeaders(headers, true);
-	ASResource::buildNonParenHeaders(nonParenHeaders, true);
-	ASResource::buildAssignmentOperators(assignmentOperators);
-	ASResource::buildNonAssignmentOperators(nonAssignmentOperators);
-	ASResource::buildPreBlockStatements(preBlockStatements);
-	ASResource::buildPreCommandHeaders(preCommandHeaders);
-	ASResource::buildIndentableHeaders(indentableHeaders);
+	TRResource::buildHeaders(headers, true);
+	TRResource::buildNonParenHeaders(nonParenHeaders, true);
+	TRResource::buildAssignmentOperators(assignmentOperators);
+	TRResource::buildNonAssignmentOperators(nonAssignmentOperators);
+	TRResource::buildPreBlockStatements(preBlockStatements);
+	TRResource::buildPreCommandHeaders(preCommandHeaders);
+	TRResource::buildIndentableHeaders(indentableHeaders);
 }
 
 /**
@@ -787,7 +787,7 @@ string ASBeautifier::beautify(const string &originalLine)
 	// relation to the preliminary white-space.
 	if (isInQuoteContinuation)
 	{
-		// trim a single space added by ASFormatter, otherwise leave it alone
+		// trim a single space added by TRFormatter, otherwise leave it alone
 		if (!(originalLine.length() == 1 && originalLine[0] == ' '))
 			line = originalLine;
 	}
@@ -921,7 +921,7 @@ string ASBeautifier::beautify(const string &originalLine)
 
 	// if there exists any worker beautifier in the activeBeautifierStack,
 	// then use it instead of me to indent the current line.
-	// variables set by ASFormatter must be updated.
+	// variables set by TRFormatter must be updated.
 	if (!isInDefine && activeBeautifierStack != NULL && !activeBeautifierStack->empty())
 	{
 		activeBeautifierStack->back()->inLineNumber = inLineNumber;
@@ -1412,7 +1412,7 @@ void ASBeautifier::deleteTempStacksContainer(vector<vector<const string*>*>* &co
 template<typename T>
 void ASBeautifier::initContainer(T &container, T value)
 {
-	// since the ASFormatter object is never deleted,
+	// since the TRFormatter object is never deleted,
 	// the existing vectors must be deleted before creating new ones
 	if (container != NULL )
 		deleteContainer(container);
@@ -2190,7 +2190,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 			// if there is a 'case' statement after these comments unindent by 1
 			if (isCaseHeaderCommentIndent)
 				--indentCount;
-			// isElseHeaderIndent is set by ASFormatter if shouldBreakElseIfs is requested
+			// isElseHeaderIndent is set by TRFormatter if shouldBreakElseIfs is requested
 			// if there is an 'else' after these comments a tempStacks indent is required
 			if (isElseHeaderIndent && lineOpensWithLineComment && !tempStacks->empty())
 				indentCount += adjustIndentCountForBreakElseIfComments();
@@ -2203,7 +2203,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 			// if there is a 'case' statement after these comments unindent by 1
 			if (isCaseHeaderCommentIndent && lineOpensWithComment)
 				--indentCount;
-			// isElseHeaderIndent is set by ASFormatter if shouldBreakElseIfs is requested
+			// isElseHeaderIndent is set by TRFormatter if shouldBreakElseIfs is requested
 			// if there is an 'else' after these comments a tempStacks indent is required
 			if (isElseHeaderIndent && lineOpensWithComment && !tempStacks->empty())
 				indentCount += adjustIndentCountForBreakElseIfComments();
@@ -2221,7 +2221,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 			if (isCaseHeaderCommentIndent && firstText == i)
 				--indentCount;
 			// if this comment close starts the line, must check for else-if indent
-			// isElseHeaderIndent is set by ASFormatter if shouldBreakElseIfs is requested
+			// isElseHeaderIndent is set by TRFormatter if shouldBreakElseIfs is requested
 			// if there is an 'else' after these comments a tempStacks indent is required
 			if (firstText == i)
 			{
@@ -2252,7 +2252,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 			// if there is a 'case' statement after these comments unindent by 1
 			if (!lineOpensWithComment && isCaseHeaderCommentIndent)
 				--indentCount;
-			// isElseHeaderIndent is set by ASFormatter if shouldBreakElseIfs is requested
+			// isElseHeaderIndent is set by TRFormatter if shouldBreakElseIfs is requested
 			// if there is an 'else' after these comments a tempStacks indent is required
 			if (!lineOpensWithComment && isElseHeaderIndent && !tempStacks->empty())
 				indentCount += adjustIndentCountForBreakElseIfComments();
@@ -3053,7 +3053,7 @@ void ASBeautifier::parseCurrentLine(const string &line)
 					if (peekNextChar(line, i) == '_')		// check for __asm
 						index = 5;
 
-					char peekedChar = ASBase::peekNextChar(line, i + index);
+					char peekedChar = TRBase::peekNextChar(line, i + index);
 					if (peekedChar == '{' || peekedChar == ' ')
 						isInAsmBlock = true;
 					else
@@ -3202,4 +3202,4 @@ void ASBeautifier::parseCurrentLine(const string &line)
 }
 
 
-}   // end namespace astyle
+}   // end namespace TaaRRule

@@ -1,42 +1,37 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *	@Project: TaaR_Coding_Style
- *	@File	: ASLocalizer.h
+ *	@File	: TRLanguage.h
  *
  *	Created	: 10/17/2024 5:52:14 PM
  *	Author	: Nghia-Taarabt
- *	Link repository: 
+ *	Link repository: https://github.com/nghia12a1-t-ara/Embedded_MyTools/tree/master/TaaR_Coding_Style
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
-#ifndef __ASLOCALIZER_H__
-#define __ASLOCALIZER_H__
+#ifndef __TRLANGUAGE_H__
+#define __TRLANGUAGE_H__
 
 #include <string>
 #include <vector>
 
 using namespace std;
 
-namespace astyle {
-
-#ifndef ASTYLE_LIB
-
 //-----------------------------------------------------------------------------
-// ASLocalizer class for console build.
+// TRLanguage class for console build.
 // This class encapsulates all language-dependent settings and is a
 // generalization of the C locale concept.
 //-----------------------------------------------------------------------------
+namespace TaaRRule {
+
 class Translation;
 
-class ASLocalizer
+class TRLanguage
 {
 	public:		// functions
-		ASLocalizer();
-		virtual ~ASLocalizer();
+		TRLanguage();
+		virtual ~TRLanguage();
 		string getLanguageID() const;
 		const Translation* getTranslationClass() const;
-#ifdef _WIN32
 		void setLanguageFromLCID(size_t lcid);
-#endif
-		void setLanguageFromName(const char* langID);
 		const char* settext(const char* textIn) const;
 
 	private:	// functions
@@ -79,46 +74,10 @@ class Translation
 // These classes have only a constructor which builds the language vector.
 //----------------------------------------------------------------------------
 
-class ChineseSimplified : public Translation
-{
-	public:
-		ChineseSimplified();
-};
-
-class ChineseTraditional : public Translation
-{
-	public:
-		ChineseTraditional();
-};
-
-class Dutch : public Translation
-{
-	public:
-		Dutch();
-};
-
 class English : public Translation
 {
 	public:
 		English();
-};
-
-class Finnish : public Translation
-{
-	public:
-		Finnish();
-};
-
-class French : public Translation
-{
-	public:
-		French();
-};
-
-class German : public Translation
-{
-	public:
-		German();
 };
 
 class Hindi : public Translation
@@ -127,63 +86,12 @@ class Hindi : public Translation
 		Hindi();
 };
 
-class Italian : public Translation
-{
-	public:
-		Italian();
-};
-
-class Japanese : public Translation
-{
-	public:
-		Japanese();
-};
-
 class Korean : public Translation
 {
 	public:
 		Korean();
 };
 
-class Polish : public Translation
-{
-	public:
-		Polish();
-};
+}	// namespace TaaRRule
 
-class Portuguese : public Translation
-{
-	public:
-		Portuguese();
-};
-
-class Russian : public Translation
-{
-	public:
-		Russian();
-};
-
-class Spanish : public Translation
-{
-	public:
-		Spanish();
-};
-
-class Swedish : public Translation
-{
-	public:
-		Swedish();
-};
-
-class Ukrainian : public Translation
-{
-	public:
-		Ukrainian();
-};
-
-
-#endif	//  ASTYLE_LIB
-
-}	// namespace astyle
-
-#endif	//  __ASLOCALIZER_H__
+#endif	//  __TRLANGUAGE_H__
