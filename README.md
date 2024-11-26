@@ -16,4 +16,4 @@
  - Simple with batch script
  - Use to create new source C file with the template
 
-<button type="button" onclick="https://www.laptrinhdientu.com/2021/10/Donate.html">🌱 Invite me a cup of coffee 🌱</button>
+**[🌱 Invite me a cup of coffee 🌱](https://www.laptrinhdientu.com/2021/10/Donate.html)**
