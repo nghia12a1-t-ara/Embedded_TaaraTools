@@ -18,7 +18,7 @@ for file in $files; do
     encoding=$(file -bi "$file" | grep -o 'charset=[^ ]*' | cut -d= -f2)
     
     # If the encoding is neither EUC-KR nor unknown, add it to the invalid_files list
-    if [[ "$encoding" != "euc-kr" && "$encoding" != "unknown-8bit" ]]; then
+    if [[ "$encoding" != "utf-8" ]]; then
         invalid_files+=("$(realpath "$file")")
     fi
 done
