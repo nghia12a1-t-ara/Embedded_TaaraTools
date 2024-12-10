@@ -16,7 +16,7 @@ This tool is used to create new source C file with the Template, used for the pr
 1. Ensure your computer has the bash.exe
 	> You can setup it manually or setup via [Cygwin package](https://www.laptrinhdientu.com/2024/09/cygwin-gcc-gdb-setup.html)
 1. Clone/download this tool to a folder, ex. D:/Tool_CreateFiles
-2. Add PATH at "Edit Environment Variable" for this folder
+2. Add PATH at "Edit Environment Variable" for this folder or run the script setup.bat to auto setup PATH Environment
 
 ### How to open / create a new file with Template
 1. Open the **Command Prompt** in your folder where you want to create new file
