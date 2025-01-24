@@ -1,9 +1,8 @@
+@echo off
 REM @file			GenFile.bat
 REM @brief			Create file with template
 REM @createdDate	22-Nov-2024
 REM @author			Nghia Taarabt
-
-@echo off
 
 REM echo Start GenFile.bat
 
@@ -19,14 +18,15 @@ if "%~1"=="" (
 set FILENAME=%~1
 set DESCRIPTION=Detail Descriptions for the Source Code
 
-REM Parse the -m option for description
 :parse_options
-shift
+if "%~1"=="" goto done
 if "%~1"=="-m" (
     set DESCRIPTION=%2
     shift
-    goto parse_options
 )
+shift
+goto parse_options
+:done
 
 REM Extract the file extension
 for %%f in (%FILENAME%) do set EXT=%%~xf
@@ -58,8 +58,8 @@ if exist "%OUTPUT_FILE%" (
 
 REM Get the current date and time
 for /f "tokens=2 delims==" %%i in ('wmic OS Get localdatetime /value') do set DT=%%i
-set CURRENT_DATE=%DT:~6,2%-%DT:~4,2%-%DT:~0,4%
-set CURRENT_TIME=%DT:~8,2%:%DT:~10,2%:%DT:~12,2%
+REM Format the date as YYYY-MM-DD
+set CURRENT_DATE=%DT:~0,4%-%DT:~4,2%-%DT:~6,2%
 
 REM Convert the filename to uppercase (handling the first character)
 REM Remove the file extension

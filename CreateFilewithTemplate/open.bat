@@ -1,9 +1,10 @@
+@echo off
 REM @file			open.bat
 REM @brief			Script to open file or create file if it doesn't exist
 REM @createdDate	22-Nov-2024
 REM @author			Nghia Taarabt
+REM ------------------------------------------------------------------------
 
-@echo off
 REM Check if input parameters are passed
 if "%~1"=="" (
     echo Usage: %0 <filename> [npp|vscode]
@@ -15,8 +16,6 @@ SET DEFAULT_EDITOR="npp"
 
 set argv1=%~1
 set argv2=%~2
-set argv3=%~3
-set argv4=%~4
 
 set "filestatus="
 set "filename="
@@ -28,7 +27,9 @@ if /i "%filestatus%"=="1" (
     call :open_file %filename% %argv2%
 ) else if /i "%filestatus%"=="0" (
     REM - file does not exist -> Create file and open it
-    call create.bat %argv1% %argv2% %argv3% %argv4%
+    echo Creating File .........
+	@echo off
+	call GenFile.bat %*
     call :open_file %argv1% %argv2%
 ) else if /i "%filestatus%"=="2" (
     REM - open last created file
