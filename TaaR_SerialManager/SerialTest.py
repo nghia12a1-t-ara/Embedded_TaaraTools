@@ -29,6 +29,7 @@ from TaaR_SerialManager import SerialManager
 import time
 
 def UART_RecvCallback(buffer):
+    # Add your code
     print("The receive character from Arduino = ", buffer)
 
 def main():
@@ -48,6 +49,7 @@ def main():
     UART.send_byte('AA')
 
     while True:
+        # Add your code
         character = input("Input the character to send to Arduino: ")
         UART.send_byte(str(character))
         time.sleep(2)
