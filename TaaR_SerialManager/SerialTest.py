@@ -13,7 +13,7 @@
 
     void setup()
     {
-      Serial.begin(9600);
+      Serial.begin(115200);
     }
     void loop()
     {
@@ -32,7 +32,7 @@ def UART_RecvCallback(buffer):
     print("The receive character from Arduino = ", buffer)
 
 def main():
-    UART = SerialManager(port="COM6", baudrate=115200)
+    UART = SerialManager(port="COM3", baudrate=115200)
     if UART.connect():
         print("Connect is done")
     else:
@@ -42,7 +42,7 @@ def main():
     # UART.SetRecvEndByte(0xBB) # default endByte = '\n'
     
     ######### Start Read Async ##########
-    UART.read_async(callback=UART_RecvCallback)
+    UART.read_async(callback=UART_RecvCallback)     # ByteNum = 1, ByteEnd = None
 
     # Send data to Arduino 'A' - Expected Recving 'B' from Arduino
     UART.send_byte('AA')
