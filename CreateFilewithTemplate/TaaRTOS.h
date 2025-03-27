@@ -1,13 +1,12 @@
+#ifndef __TAARTOS_H__
+#define __TAARTOS_H__
+ 
 /**
- * @file     {{filename}}.h
- * @CreatedDate {{date}} {{time}}
- * @brief  {{description}}
+ * @file     TaaRTOS.h
+ * @CreatedDate 2025-03-22 
+ * @brief  Main header file for TaaRTOS
  * @{
  */
-
-#ifndef __{{uppername}}_H__
-#define __{{uppername}}_H__
-
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -53,4 +52,4 @@ extern "C"{
 
 /** @} */
 
-#endif  /* __{{uppername}}_H__ */
+#endif  /* __TAARTOS_H__ */
