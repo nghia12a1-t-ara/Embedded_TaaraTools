@@ -314,7 +314,6 @@ Explain# Created by https://www.toptal.com/developers/gitignore/api/python,qt,qt
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
