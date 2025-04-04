@@ -840,6 +840,10 @@ class SettingsDialog(QDialog):
             "chunk_size_mb": self.chunk_spin.value()
         }
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class FileCopyTool(QMainWindow):
     def __init__(self):
@@ -848,7 +852,7 @@ class FileCopyTool(QMainWindow):
         self.setWindowTitle("Enhanced SCP File Copy Tool - by laptrinhdientu.com")
         self.setGeometry(100, 100, 800, 600)
         # Optional: Uncomment to set a window icon
-        self.setWindowIcon(QIcon("./icon.ico"))
+        self.setWindowIcon(QIcon(resource_path("icon.ico")))
 
         # Initialize settings to save user preferences
         self.settings = QSettings("LGEDV", "FileCopyTool")
@@ -950,7 +954,7 @@ class FileCopyTool(QMainWindow):
         # Donate button
         donate_button = QPushButton()
         donate_button.setFixedSize(150, 60)
-        donate_button.setIcon(QIcon("./bmc.svg"))
+        donate_button.setIcon(QIcon(resource_path("bmc.svg")))
         donate_button.setIconSize(QSize(150, 60))
         donate_button.setFlat(True)
         donate_layout = QHBoxLayout()
