@@ -1,6 +1,5 @@
 #################################################################################
 '''
-    @file    : Taa_RemoteCopyTool.py
     @project : Copy File Tools
     @brief   : Tool to copy files/folders between 2 computers on the same network
     @author  : Nghia Taarabt
@@ -846,10 +845,10 @@ class FileCopyTool(QMainWindow):
     def __init__(self):
         super().__init__()
         # Set window title and size
-        self.setWindowTitle("Enhanced SCP File Copy Tool")
+        self.setWindowTitle("Enhanced SCP File Copy Tool - by laptrinhdientu.com")
         self.setGeometry(100, 100, 800, 600)
         # Optional: Uncomment to set a window icon
-        # self.setWindowIcon(QIcon("path/to/your/icon.png"))
+        self.setWindowIcon(QIcon("./icon.ico"))
 
         # Initialize settings to save user preferences
         self.settings = QSettings("LGEDV", "FileCopyTool")
