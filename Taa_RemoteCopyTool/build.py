@@ -51,21 +51,18 @@ def run_pyinstaller():
     for src, dst in DATA_FILES:
         command.append("--add-data")
         # Use the appropriate path separator based on the operating system
-        if sys.platform == "win32":
-            command.append(f"{os.path.abspath(src)};{dst}")  # Windows uses semicolon
-        else:
-            command.append(f"{os.path.abspath(src)}:{dst}")  # Linux/macOS uses colon
+        separator = ";" if sys.platform == "win32" else ":"
+        command.append(f"{os.path.abspath(src)}{separator}{dst}")
 
     # Append the main file to the command
     command.append(MAIN_FILE)
 
-    # Print the full command for debugging purposes
     print("Running command:", " ".join(command))
 
     try:
         # Execute the PyInstaller command and capture output
         result = subprocess.run(command, check=True, text=True, capture_output=True)
-
+        
         # Clean up temporary files and folders
         for file in files:
             if os.path.exists(file) and os.path.isfile(file):
