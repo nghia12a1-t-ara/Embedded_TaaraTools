@@ -8,6 +8,11 @@ from moviepy import VideoFileClip
 # Default logo path
 default_logo_path = r"D:\STM32\My_BLOG\logoIcon.png"
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 def select_file():
     file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.gif")])
     if file_path:
